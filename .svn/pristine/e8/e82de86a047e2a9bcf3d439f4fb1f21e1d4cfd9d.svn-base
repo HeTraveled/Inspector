@@ -1,0 +1,524 @@
+<%@ page contentType="text/html;charset=utf-8"%>
+
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%
+	String path = request.getContextPath();
+	String basePath = request.getScheme() + "://"
+			+ request.getServerName() + ":" + request.getServerPort()
+			+ path + "/";
+	String filePath = request.getScheme() + "://"
+			+ request.getServerName() + ":" + request.getServerPort()
+			+ "/";
+%>
+<%
+	response.setCharacterEncoding("UTF-8");
+%>
+<!DOCTYPE html>
+<html>
+<head>
+<link href="<%=basePath%>jsAndcss/css/editor.css" rel="stylesheet" />
+<link rel="stylesheet"
+	href="<%=basePath%>ueditor-mini1.2.2/themes/default/_css/umeditor.css"
+	type="text/css"></link>
+	 <link rel="stylesheet" href="<%=basePath%>jsAndcss/easyUpload/easy-upload.css">
+<link rel="stylesheet" type="text/css"
+	href="<%=basePath%>jsAndcss/ymnets.easyui/themes/base/easyui.css">
+<link href="<%=basePath%>jsAndcss/ymnets.easyui/themes/skin-green.css"
+	rel="stylesheet" />
+<script type="text/javascript"
+	src="<%=basePath%>jsAndcss/ymnets.easyui/jquery.min.js"></script>
+<script type="text/javascript"
+	src="<%=basePath%>jsAndcss/ymnets.easyui/jquery.easyui.min.js"></script>
+<script
+	src="<%=basePath%>jsAndcss/ymnets.easyui/content/js/datagrid-filter.js"></script>
+<script type="text/javascript"
+	src="<%=basePath%>ueditor-mini1.2.2/umeditor.config.js" charset="utf-8"></script>
+<script type="text/javascript"
+	src="<%=basePath%>ueditor-mini1.2.2/editor_api.js" charset="utf-8"></script>
+<script type="text/javascript"
+	src="<%=basePath%>ueditor-mini1.2.2/lang/zh-cn/zh-cn.js"></script>
+<script
+	src="<%=basePath%>jsAndcss/ymnets.easyui/locale/easyui-lang-zh_CN.js"></script>
+<script src="<%=basePath%>js/ajaxfileupload.js"></script>
+<script src="<%=basePath%>jsAndcss/easyUpload/vendor/jquery.cookie-1.4.1.min.js"></script>
+<script src="<%=basePath%>jsAndcss/easyUpload/easyUpload.js"></script>
+<script src="<%=basePath%>js/url.js"></script>
+<script type="text/javascript" src="<%=basePath%>layDate-v5.0.9/laydate/laydate.js"></script>
+<link
+	href="<%=basePath%>jsAndcss/ymnets.easyui/content/fontawesome/css/font-awesome.min.css"
+	rel="stylesheet" />
+</head>
+<body>
+	<div style="margin:15px 0;"></div>
+	<h2>新建文件</h2>
+	<div class="easyui-panel"
+		style="width:100%;max-width:100%;padding:30px 60px;">
+		<form id="frm" method="post">
+			<div style="margin-bottom:20px;">
+				<input class="easyui-textbox" id="title" iconWidth="28"
+					style="width:300px;height:34px;padding:10px"
+					data-options="label:'公&nbsp;&nbsp;告&nbsp;标&nbsp;题&nbsp;：&nbsp;',required:true,missingMessage:'*必填项'">
+				&nbsp;&nbsp;&nbsp;
+			</div>
+			<div style="margin-bottom:20px;">
+				<font>类&nbsp;型&nbsp;选&nbsp;择&nbsp;：&nbsp;</font> <select
+					style="width:150px;height:34px;padding:10px;border-radius:5px;border:1px solid #d3d3d3"
+					; id="type" name="type" editable="false">
+					<option value="0">请选择类型</option>
+
+					<option value="1">协同文件</option>
+					<c:if test="${Special1==1 }">
+						<option value="2">办理文件</option>
+					</c:if>
+					<c:if test="${Special2==1 }">
+						<option value="3">集团红头</option>
+					</c:if>
+
+				</select>
+			</div>
+
+			<div style="display:flex;width:100%;padding-bottom:13px;">
+
+				<div style="padding-right:13px;">
+					<font>选&nbsp;择&nbsp;时&nbsp;间&nbsp;：&nbsp;</font><input
+						type="text" class="layui-input" id="startTime" placeholder="请输入开始时间"
+						
+						style="width:210px;padding:10px;height:14px;border-radius: 5px;border: 1px solid #d3d3d3;">
+				</div>
+				<div>
+					<input type="text" class="layui-input" id="endTime" placeholder="请输入结束时间"
+					
+						style="width:210px;padding:10px;height:14px;border-radius: 5px;border: 1px solid #d3d3d3;" />
+				</div>
+			</div>
+			<div style="margin-bottom:20px;" id="site">
+				<input class="easyui-textbox" id="assistDept"
+					data-options="label:'发&nbsp;送&nbsp;范&nbsp;围&nbsp;：&nbsp;'"
+					style="width:320px;height:50px;padding:10px">
+			</div>
+
+
+
+			<div style="margin-bottom:20px;">
+				<label><h2>文件正文：</h2>
+				</label>
+				<script type="text/plain" id="body" style="width:100%;height:400px;">
+ 		   
+				</script>
+			</div>
+
+
+			<div style="margin-bottom:20px;">
+				<label>附件上传：</label>
+			<div id="easyContainer"></div>
+			</div>
+			<input value="${user}" id="role" type="hidden"> <input
+				value="${uid}" id="uid" type="hidden">
+			<div style="margin-bottom:20px;margin-left: 2%;">
+				<a href="javascript:void(0)" class="easyui-linkbutton"
+					onclick="submitForm(2)" style="width:100px">取消</a>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="javascript:void(0)"
+					class="easyui-linkbutton" onclick="submitForm(1)"
+					style="width:100px">确认</a>
+			</div>
+		</form>
+	</div>
+</body>
+<script type="text/javascript">
+var successFiles=[];
+var j = 1;
+	$(function() {
+	
+		//实例化编辑器
+		var body = UM.getEditor('body');
+		var requirements = UM.getEditor('requirements');
+		$('#assistDept').combotree({
+			url : 'assistUserTree',
+			labelPosition : 'top',
+			multiple : true,
+			animate : true,
+			lines : true,
+		});
+		
+		$('#easyContainer').easyUpload({
+      allowFileTypes: '*',//允许上传文件类型，格式';*.doc;*.pdf'
+      allowFileSize: 20480000,//允许上传文件大小(KB)
+      selectText: '选择文件',//选择文件按钮文案
+      multi: true,//是否允许多文件上传
+      multiNum: 100,//多文件上传时允许的文件数
+      showNote: true,//是否展示文件上传说明
+      note: '全选',//文件上传说明
+      showPreview: true,//是否显示文件预览
+      url: '../home/uploadPic',//上传文件地址
+      fileName: 'file',//文件filename配置参数
+      timeout: 30000,//请求超时时间
+      okCode: 200,//与后端返回数据code值一致时执行成功回调，不配置默认200
+      successFunc: function(res) {
+      var flies=[];
+     for(i=0;i<res.success.length;i++){
+     	flies.push(res.success[i].data);
+     }
+        successFiles=flies;
+      },
+      errorFunc: function(res) {
+         $.messager.alert('系统提示','上传失败！','error');
+      },
+      deleteFunc: function(res) {
+      console.log(res)
+          var flies=[];
+     for(i=0;i<res.success.length;i++){
+     	flies.push(res.success[i].data);
+     }
+        successFiles=flies;
+      }
+    });
+    laydate.render({
+  elem: '#startTime'
+  ,type: 'datetime'
+});
+    laydate.render({
+  elem: '#endTime'
+  ,type: 'datetime'
+});
+ 
+	});
+
+	
+	function delRow(id) {
+		$("body").find(".annc" + id).remove();
+		j--;
+	}
+
+	$("#type")
+			.combobox(
+					{
+						onChange : function() {
+						
+							/* console.log($("#type").val()) */
+							var type = $("#type").val();
+							if (type ==2||type==3) {
+					
+							
+							if($("body").find(".radiotype").length<1){
+								var newRow = '<div style="margin-bottom:20px;padding-top:20px;" class="radiotype">'
+										+ '<label>事&nbsp;件&nbsp;类&nbsp;型&nbsp;：</label>'
+										+ '<input type="radio" id="frequency" name="frequency" onclick="test(this)" value="0" checked>阅件&nbsp;&nbsp;'
+										+ '<input type="radio" id="frequency" name="frequency" onclick="test(this)" value="1">日程件&nbsp;&nbsp;&nbsp;&nbsp;'
+										+ '</div>';
+								$("#site").append(newRow);
+								
+								}
+							} else {
+								$("body").find(".radiotype").remove();
+								for (i = 1; i <= j; i++) {
+									$("body").find(".annc" + i).remove();
+								}
+								j = 1;
+							}
+						}
+					});
+
+	function test() {
+		var number = $("input[type=radio]:checked").val();
+		if (number == 1) {
+			if ($(".demos").length > 0) {
+				return;
+			}
+
+			var newRow2 = '<div  class="annc'
+					+ j
+					+ ' demos" style="display:flex;width:100%">'
+					+ '<div style="width:100%">'
+					+ '<div style="width:100%;padding-top:5px;padding-bottom:13px;">'
+					+ '<font>办&nbsp;&nbsp;&nbsp;件&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;：&nbsp;&nbsp;&nbsp;</font>'
+					+ '<input class=""  id="body1" iconWidth="28" style="    border-radius: 5px;border: 1px solid #ddd;width:451px;height:14px;padding:10px"  >'
+					+ '<a href="javascript:void(0)" class="l-btn" id="add2" onclick="add()" style="margin-left:3px;width:43px;height:28px;    line-height: 27px;">添加</a>'
+					+ '</div>'
+					+ '<div style="display:flex;width:100%;padding-top:13px;padding-bottom:13px;">'
+					+ '<div style="padding-right:13px;"><font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+					+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+					+ '</font><input type="text" class="layui-input"  id="startTime1" placeholder="请输入开始时间" style="width:208px;height:14px;padding:10px;border-radius: 5px;border: 1px solid #d3d3d3;"></div>'
+					+ '<div ><input type="text" class="layui-input"  id="endTime1" placeholder="请输入结束时间" style="width:208px;height:14px;padding:10px;border-radius: 5px;border: 1px solid #d3d3d3;"></div>'
+					+ '</div>' + '</div>';
+			$("#site").append(newRow2);
+						laydate.render({
+						  elem: '#endTime'+j
+						  ,type: 'datetime'
+						});
+						 laydate.render({
+						  elem: '#startTime'+j
+						  ,type: 'datetime'
+						});
+		} else {
+			for (i = 1; i <= j; i++) {
+				$("body").find(".annc" + i).remove();
+			}
+			j = 1;
+		}
+	}
+
+	function add() {
+		j++;
+		var newRow2 = '<div  class="annc'
+				+ j
+				+ ' demos" style="display:flex;width:100%">'
+				+ '<div style="width:100%">'
+				+ '<div style="width:100%;padding-top:5px;padding-bottom:13px;">'
+				+ '<font>办&nbsp;&nbsp;&nbsp;件&nbsp;&nbsp;&nbsp;'
+				+ j
+				+ '&nbsp;&nbsp;&nbsp;：&nbsp;&nbsp;&nbsp;</font>'
+				+ '<input class=""  id="body'+j+'" iconWidth="28" style="    border-radius: 5px;border: 1px solid #ddd;width:451px;height:14px;padding:10px"  >'
+				+ '<a href="#" class="l-btn" id="add2" style="margin-left:3px;width:43px;height:28px;    line-height: 27px;" onclick=delRow('
+				+ j
+				+ ')>删除</a>'
+				+ '</div>'
+				+ '<div style="display:flex;width:100%;padding-top:13px;padding-bottom:13px;">'
+				+ '<div style="padding-right:13px;"><font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+				+ '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'
+				+ '</font><input type="text" class="layui-input"  id="startTime'+j+'" placeholder="请输入开始时间" style="width:208px;height:14px;padding:10px;border-radius: 5px;border: 1px solid #d3d3d3;"></div>'
+				+ '<div ><input type="text" class="layui-input"  id="endTime'+j+'" placeholder="请输入结束时间" style="width:208px;height:14px;padding:10px;border-radius: 5px;border: 1px solid #d3d3d3;"></div>'
+				+ '</div>' + '</div>';
+		$("#site").append(newRow2);
+		laydate.render({
+						  elem: '#endTime'+j
+						  ,type: 'datetime'
+						});
+						 laydate.render({
+						  elem: '#startTime'+j
+						  ,type: 'datetime'
+						});
+	};
+
+	function submitForm(flag) {
+
+		if (flag == 1) {
+			var assistDept = $("#assistDept").val();
+			var uid=$("#uid").val();
+		
+			if ($("#title").val() == '' || $("#title").val() == null)
+				return false;
+			if ($("#type").val() == 0) {
+				$.messager.alert('系统提示', '请选择公告类型！', 'warning');
+				return false;
+			}
+
+			if (assistDept == null || assistDept == '') {
+				$.messager.alert('系统提示', '请选择被通知人员！', 'warning');
+				return false;
+			}
+			
+			if ($("#startTime").val() == "" || $("#startTime").val() == null) {
+				$.messager.alert('系统提示', '请选择开始时间！', 'warning');
+				return false;
+			}
+			
+			if (new Date($("#startTime").val()) > new Date($("#endTime").val())) {
+				$.messager.alert('系统提示', '开始时间不能大于结束时间！', 'warning');
+				return false;
+			}
+
+			var numbers = $("body").find(".demos").length;
+			
+			if (numbers > 0) {
+				for (k = 1; k <= numbers; k++) {
+					
+					if ($("#body" + k).val() == null
+							|| $("#body" + k).val() == "") {
+						$.messager.alert('系统提示', '内容不能为空！', 'warning');
+						return false;
+
+					} else {
+						if ($("#startTime" + k).val() == ""
+								|| $("#startTime" + k).val() == null) {
+							$.messager.alert('系统提示', '请选择开始时间！', 'warning');
+							return false;
+						} else {
+							if ($("#startTime" + k).val() != null
+									&& $("#endTime" + k).val() != null) {
+								if (new Date($("#startTime" + k).val()) > new Date(
+										$("#endTime" + k).val())) {
+									$.messager.alert('系统提示', '开始时间不能大于结束时间！',
+											'warning');
+									return false;
+								}
+							}
+						}
+					}
+				}
+			}
+			   if($("#endTime").val()==''||$("#endTime").val()==null){
+			$.messager.confirm('系统提升', '您未选择截止时间，确定继续吗?', function(r) {
+				if (r) {
+				creatskip();
+				}
+				});
+			}else{
+			creatskip();
+			} 
+		function creatskip(){
+			var text = (UM.getEditor('body').getContent());
+			var typeofs = $("#type").val();
+			var title = $("#title").val();
+			var startTime = $("#startTime").val();
+
+			var endTime = $("#endTime").val();
+			var frequency = "";
+			var radios = document.getElementsByName("frequency");
+			for ( var i = 0; i < radios.length; i++)
+				if (radios[i].checked)
+					frequency = radios[i].value;
+			if (frequency == null || frequency == "")
+				frequency = 0;
+
+			var data = {
+				"title" : title,
+				"type" : typeofs,
+				"startTime" : new Date(startTime),
+				"endTime" : new Date(endTime),
+				"range" : assistDept,
+				"text" : text,
+				"file" : $("#file").val(),
+				"state" : Number(frequency),
+				"schedule" : [],
+				"files":successFiles
+			};
+
+			var numbers = $("body").find(".demos").length;
+			if (numbers > 0) {
+
+				for (l = 1; l <= numbers; l++) {
+				
+					var st = new Date($("#startTime" + l).val());
+					var et = $("#endTime" + l).val();
+				
+					if (et == null || et == "") {
+						et = new Date($("#startTime" + l).val());;
+						
+						if (et.getHours() < 12) {
+							et.setHours(12, 00, 00, 00);
+						} else {
+							et.setHours(17, 00, 00, 00);
+						}
+					}
+					var stt = st.toLocaleString();
+					var ett = et.toLocaleString();
+					
+
+					var schedules = {
+						"body" : $("#body" + l).val(),
+						"startTime" : stt,
+						"endTime" : ett
+					};
+
+					data.schedule.push(schedules);
+				}
+			}
+	
+			$.ajax({
+				type : "POST",
+				url : "createAnnc",
+				contentType : "application/json",
+				data : JSON.stringify(data),
+				success : function(data) {
+					if (data.code >0) {
+					window.parent.frameReturnByMes(data.message);
+						window.parent.frameReturnByClose();
+					
+					/* if(frequency==1){
+						$.messager.confirm('系统提升', '文件发布成功，是否转为督查事项?', function(r) {
+				if (r) {
+						var code=data.code;
+						
+						setTimeout(function(){
+						  window.location.href="../Annc/saveanncelse?id="+code;
+						 }, 500);  
+						 
+						 }else{
+						 	window.parent.frameReturnByMes(data.message);
+						 	window.parent.frameReturnByClose();
+						 }
+						 });
+						 }else{ 
+						window.parent.frameReturnByMes(data.message);
+						window.parent.frameReturnByClose();
+						 };  */
+						}else{ 
+						window.parent.frameReturnByMes(data.message);
+						window.parent.frameReturnByClose();
+						 };
+				},
+				error : function(request) {
+					$.messager.alert('系统提示', '请求出错！', 'error');
+				}
+			});}
+		}
+		if (flag != 1) {
+			window.parent.frameReturnByClose();
+		}
+	}
+
+	$(document).on('change', '#uploadFile', function() {
+		ajaxFileUpload();
+	});
+
+	function ajaxFileUpload() {
+		var filePath = $('#filePath').val();
+		$.ajaxFileUpload({
+			url : 'uploadAnncFile',
+			secureuri : false,
+			fileElementId : 'uploadFile',
+			dataType : 'text',
+			enctype : 'multipart/form-data',
+			success : function(data) {
+				$("#file").val(filePath + data);
+			},
+			error : function(data, status, e) {
+				$.messager.alert('系统提示', '请求出错！', 'error');
+			}
+		});
+	}
+
+	Date.prototype.toLocaleString = function() {
+		if (this.getMonth() < 10) {
+			var month = 0 + (this.getMonth() + 1);
+		} else {
+			var month = (this.getMonth() + 1);
+		}
+		if (this.getDate() < 10) {
+			var date = 0 + this.getDate();
+		} else {
+			var date = this.getDate();
+		}
+		if (this.getHours() < 10) {
+			var hours = 0 + this.getHours();
+		} else {
+			var hours = this.getHours();
+		}
+		if (this.getMinutes() < 10) {
+			var minutes = 0 + this.getMinutes();
+		} else {
+			var minutes = this.getMinutes();
+		}
+		if (this.getSeconds() < 10) {
+			var seconds = 0 + this.getSeconds();
+		} else {
+			var seconds = this.getSeconds();
+		}
+
+		return this.getFullYear() + "-" + month + "-" + date + " " + hours
+				+ ":" + minutes + ":" + seconds;
+	};
+
+	/* selectId.onchange = function(){
+	var selectId = document.getElementById("type");
+	var result = selectId.options[selectId.selectedIndex].innerHTML;
+	alert(result)
+	} */
+	/* $("#types").on("change",function(){
+	console.log($(this).val())
+	    if($(this).val()=="1"){
+	    alert("协同文件");
+	}
+	}) */
+</script>
+</html>

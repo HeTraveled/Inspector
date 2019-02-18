@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dept.mapper.EmergencyRecordMapper" >
+  <resultMap id="BaseResultMap" type="com.dept.model.EmergencyRecord" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="body" property="body" jdbcType="VARCHAR" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="liable" property="liable" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, body, state, end_time,liable
+  </sql>
+    <select id="display" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  	  select  er.*
+  	from emergency_record er,emergency eme
+  	where 
+  	er.id=eme.source_id and eme.source=3
+  	 and eme.did=#{did} and eme.emergency=#{emergency} 
+  </select>
+  <select id="top5" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  	  select  er.*
+  	from emergency_record er,emergency eme
+  	where 
+  	er.id=eme.source_id and eme.source=3
+  	 and eme.did=#{did} and eme.emergency=#{emergency}  limit 5
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from emergency_record
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from emergency_record
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.dept.model.EmergencyRecord" >
+    insert into emergency_record (id, body, state, 
+      end_time,liable)
+    values (#{id,jdbcType=INTEGER}, #{body,jdbcType=VARCHAR}, #{state,jdbcType=INTEGER}, 
+      #{endTime,jdbcType=TIMESTAMP},#{liable,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.dept.model.EmergencyRecord" >
+   <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+          SELECT LAST_INSERT_ID()
+      </selectKey>
+    insert into emergency_record
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="body != null" >
+        body,
+      </if>
+      <if test="state != null" >
+        state,
+      </if>
+      <if test="endTime != null" >
+        end_time,
+      </if>
+            <if test="liable != null" >
+        liable,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="body != null" >
+        #{body,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=INTEGER},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+            <if test="liable != null" >
+        #{liable,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.dept.model.EmergencyRecord" >
+    update emergency_record
+    <set >
+      <if test="body != null" >
+        body = #{body,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=INTEGER},
+      </if>
+      <if test="endTime != null" >
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+            <if test="liable != null" >
+        liable = #{liable,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.dept.model.EmergencyRecord" >
+    update emergency_record
+    set body = #{body,jdbcType=VARCHAR},
+      state = #{state,jdbcType=INTEGER},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+       liable = #{liable,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

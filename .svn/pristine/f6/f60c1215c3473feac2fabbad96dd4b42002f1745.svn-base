@@ -1,0 +1,164 @@
+package com.sys.controller;
+
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.dept.model.Dept;
+import com.home.model.User;
+import com.home.service.UserService;
+import com.inspector.model.Inspector;
+import com.sys.model.Horn;
+import com.sys.model.MesWechat;
+import com.sys.model.MesWechatRecord;
+import com.sys.service.HornService;
+import com.sys.service.MesWechatRecordService;
+import com.sys.service.MesWechatService;
+import com.util.Log;
+import com.util.json.Json;
+import com.util.page.DataGrid;
+import com.util.page.PagedResult;
+import com.wechat.controller.WechatController;
+
+import springfox.documentation.annotations.ApiIgnore;
+
+
+@Controller
+@Scope("prototype")
+@ApiIgnore
+@RequestMapping("mesWechat")
+public class MesWechatController {
+	
+	@Autowired
+	private MesWechatService mesWechatService;
+	@Autowired
+	private MesWechatRecordService mesWechatRecordService;
+	@Autowired
+	private UserService userService;
+	
+	/*
+	 * 微信消息推送列表
+	 */
+	
+	@RequestMapping("mesList")
+	@ResponseBody
+	public DataGrid mesList(@RequestParam(value="page",required=false) Integer page,
+			@RequestParam(value="rows",required=false) Integer rows,HttpServletRequest request){
+		try {
+			DataGrid datagrid=new DataGrid();
+			PagedResult<MesWechat> pagedResult=mesWechatService.display(null,page,rows);
+				 datagrid.setTotal(pagedResult.getTotal());
+				 datagrid.setRows(pagedResult.getDataList());
+			 	return datagrid;
+		} catch (Exception e) {
+			Log.getLogger().error(e.getMessage(), e);
+			return null;
+		}
+	}
+	
+	/*
+	 * 微信消息推送入口
+	 */
+	@RequestMapping(value="data")
+	public ModelAndView data(HttpServletRequest request){
+		ModelAndView mv=new ModelAndView();
+		mv.setViewName("sys/mesWechat");
+		return mv;
+	}
+	/**
+	 * 详情页
+	 */
+	@RequestMapping("mesDetails")
+	public ModelAndView mesDetails(@RequestParam("id") Integer id,
+			HttpServletRequest request) {
+		ModelAndView mv = new ModelAndView();
+		mv.addObject("mesWechat",mesWechatService.selectid(id));
+		List<MesWechatRecord> mesWechatRecords=mesWechatRecordService.selectid(id);
+		StringBuffer sb=new StringBuffer();
+		if(mesWechatRecords!=null&&mesWechatRecords.size()!=0){
+			for(int i=0;i<mesWechatRecords.size();i++){
+				MesWechatRecord mr=mesWechatRecords.get(i);
+				if(i==0)sb.append(mr.getName());
+				else sb.append(","+mr.getName());
+			}
+		}
+		mv.addObject("mesWechatRecord",sb.toString());
+		mv.setViewName("sys/mesWechatDetails");
+		return mv; 
+	}
+	/**
+	 * 创建页
+	 */
+	@RequestMapping("createMesWechatPage")
+	public ModelAndView createMesWechatPage(HttpServletRequest request) {
+		ModelAndView mv = new ModelAndView();
+		mv.setViewName("sys/createMesWechat");
+		return mv;
+	}
+	/**
+	 * 创建
+	 */
+	@RequestMapping("createMesWechat")
+	@ResponseBody
+	public Json createMesWechat(@RequestBody MesWechat mesWechat,HttpServletRequest request){
+		try {
+			Date date=new Date();
+			mesWechat.setTime(date);
+			Integer id=mesWechatService.create(mesWechat);
+			if(id!=null){
+				String names=mesWechat.getNames();
+				String[] name=names.split(",");
+				List<MesWechatRecord> mesWechatRecords=new ArrayList<MesWechatRecord>();
+				for(int i=0;i<name.length;i++){
+					if(name[i].length()<6){
+					//判断用户是否绑定微信
+					User user=userService.selectuid(Integer.parseInt(name[i]));
+					if(user.getWechat()!=null&&!user.getWechat().equals("")){
+					WechatController.sendWechat(mesWechat.getType(), mesWechat.getBody(), date.toLocaleString(), mesWechat.getReks(), user.getWechat());
+					mesWechatRecords.add(new MesWechatRecord(id,Integer.parseInt(name[i])));
+					}
+					}
+				}
+				if(mesWechatRecordService.creates(mesWechatRecords)!=0){
+				return new Json(200,"操作成功！",null);
+				}
+				else return new Json(201,"操作失败！",null);
+			}
+			else return new Json(201,"操作失败！",null);
+		} catch (Exception e) {
+			  Log.getLogger().error(e.getMessage(),e);  
+		         return new Json(500,null,null);
+		}
+	}
+	/**
+	 * 删除多项
+	 */
+	@RequestMapping(value="deletes",method = RequestMethod.POST)
+	@ResponseBody
+	public Json deletes(@RequestBody List<Integer> id,HttpServletRequest request){
+		try {
+			if(mesWechatService.deletes(id)!=0){
+				mesWechatRecordService.deletes(id);
+				return new Json(200,"操作成功！",null);
+			}else return new Json(201,"操作失败！",null);
+		} catch (Exception e) {
+			  Log.getLogger().error(e.getMessage(),e);
+		         return new Json(500,null,null);
+		}
+	}
+}

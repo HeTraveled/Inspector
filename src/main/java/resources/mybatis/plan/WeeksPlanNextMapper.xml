@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.plan.mapper.WeeksPlanNextMapper" >
+  <resultMap id="BaseResultMap" type="com.plan.model.WeeksPlanNext" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="wid" property="wid" jdbcType="INTEGER" />
+    <result column="body" property="body" jdbcType="VARCHAR" />
+    <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+      <result column="remarks" property="remarks" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, wid, body, start_time, end_time, state,remarks
+  </sql>
+    <select id="weeksEmergency" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  	select  wpn.*
+  	from weeks_plan_next wpn,emergency eme
+  	where 
+  	wpn.id=eme.source_id and eme.source=2
+  	 and eme.did=#{did} and eme.emergency=#{emergency}
+  </select>
+  <select id="weeksEmergencyTop5" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  	select  wpn.*
+  	from weeks_plan_next wpn,emergency eme
+  	where 
+  	wpn.id=eme.source_id and eme.source=2
+  	 and eme.did=#{did} and eme.emergency=#{emergency}  limit 5
+  </select>
+    <select id="selectEme" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  	select 
+  	   <include refid="Base_Column_List" />
+  	from weeks_plan_next
+  	where wid=#{wid}
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from weeks_plan_next
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from weeks_plan_next
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.plan.model.WeeksPlanNext" >
+    insert into weeks_plan_next (id, wid, body, 
+      start_time, end_time, state,remarks
+      )
+    values (#{id,jdbcType=INTEGER}, #{wid,jdbcType=INTEGER}, #{body,jdbcType=VARCHAR}, 
+      #{startTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, #{state,jdbcType=INTEGER}
+      , #{remarks,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.plan.model.WeeksPlanNext" >
+    insert into weeks_plan_next
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="wid != null" >
+        wid,
+      </if>
+      <if test="body != null" >
+        body,
+      </if>
+      <if test="startTime != null" >
+        start_time,
+      </if>
+      <if test="endTime != null" >
+        end_time,
+      </if>
+      <if test="state != null" >
+        state,
+      </if>
+       <if test="remarks != null" >
+        remarks,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="wid != null" >
+        #{wid,jdbcType=INTEGER},
+      </if>
+      <if test="body != null" >
+        #{body,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null" >
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=INTEGER},
+      </if>
+       <if test="remarks != null" >
+        #{remarks,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.plan.model.WeeksPlanNext" >
+    update weeks_plan_next
+    <set >
+      <if test="wid != null" >
+        wid = #{wid,jdbcType=INTEGER},
+      </if>
+      <if test="body != null" >
+        body = #{body,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null" >
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=INTEGER},
+      </if>
+        <if test="remarks != null" >
+        remarks = #{remarks,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.plan.model.WeeksPlanNext" >
+    update weeks_plan_next
+    set wid = #{wid,jdbcType=INTEGER},
+      body = #{body,jdbcType=VARCHAR},
+      start_time = #{startTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      state = #{state,jdbcType=INTEGER},
+       remarks = #{remarks,jdbcType=VARCHAR},
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <select id="selectbynext" resultType="com.plan.model.WeeksPlanNext" parameterType="java.lang.Integer" >
+    SELECT
+    w.*
+	FROM weeks_plan_next w
+	WHERE w.wid=#{wid,jdbcType=INTEGER} 
+  </select>
+  
+  
+  <insert id="weeksplannextinsert" parameterType="java.util.List">
+		 insert into weeks_plan_next (id, wid, body, 
+      start_time, end_time, state,remarks
+      )values 
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(null,
+			#{item.wid,jdbcType=INTEGER},
+			#{item.body,jdbcType=VARCHAR},
+			#{item.startTime,jdbcType=TIMESTAMP},
+			#{item.endTime,jdbcType=TIMESTAMP},
+			#{item.state,jdbcType=INTEGER},null)
+		</foreach>
+	</insert>
+	<select id="weeksplannextoverdue" resultMap="BaseResultMap">
+  	select 
+  	 <include refid="Base_Column_List" />
+  	 from weeks_plan_next
+  	 where state=1
+  	 and now()>end_time
+  </select>
+  <update id="updateOverdue" parameterType="java.util.List">
+            update weeks_plan_next set state=3 where id in
+           <foreach collection="list" item="id" index="index" separator="," open="(" close=")">
+        	#{id}
+    </foreach>
+  </update>
+</mapper>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dept.mapper.EmergencyMapper" >
+  <resultMap id="BaseResultMap" type="com.dept.model.Emergency" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="did" property="did" jdbcType="INTEGER" />
+    <result column="emergency" property="emergency" jdbcType="INTEGER" />
+    <result column="source" property="source" jdbcType="INTEGER" />
+    <result column="source_id" property="sourceId" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, did, emergency, source, source_id
+  </sql>
+    <delete id="deleteins" parameterType="java.lang.Integer">
+  	delete from emergency where source=1 and source_id=#{id}
+  </delete>
+  <delete id="delete" parameterType="com.dept.model.Emergency">
+  	delete from emergency where did=#{did} and source=#{source} and source_id=#{sourceId}
+  </delete>
+  <delete id="delWeek" parameterType="java.lang.Integer" >
+  	delete from emergency where source=2
+  </delete>
+    <insert id="creates" parameterType="java.util.List">
+  	  insert into emergency (id, did, emergency, 
+      source, source_id)
+    values 
+    <foreach collection="list" item="eme" index="index" separator=",">
+        	 (null, #{eme.did,jdbcType=INTEGER}, #{eme.emergency,jdbcType=INTEGER}, 
+      #{eme.source,jdbcType=INTEGER}, #{eme.sourceId,jdbcType=INTEGER})
+    </foreach>
+  </insert>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from emergency
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from emergency
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.dept.model.Emergency" >
+    insert into emergency (id, did, emergency, 
+      source, source_id)
+    values (#{id,jdbcType=INTEGER}, #{did,jdbcType=INTEGER}, #{emergency,jdbcType=INTEGER}, 
+      #{source,jdbcType=INTEGER}, #{sourceId,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.dept.model.Emergency" >
+    insert into emergency
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="did != null" >
+        did,
+      </if>
+      <if test="emergency != null" >
+        emergency,
+      </if>
+      <if test="source != null" >
+        source,
+      </if>
+      <if test="sourceId != null" >
+        source_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="did != null" >
+        #{did,jdbcType=INTEGER},
+      </if>
+      <if test="emergency != null" >
+        #{emergency,jdbcType=INTEGER},
+      </if>
+      <if test="source != null" >
+        #{source,jdbcType=INTEGER},
+      </if>
+      <if test="sourceId != null" >
+        #{sourceId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.dept.model.Emergency" >
+    update emergency
+    <set >
+      <if test="did != null" >
+        did = #{did,jdbcType=INTEGER},
+      </if>
+      <if test="emergency != null" >
+        emergency = #{emergency,jdbcType=INTEGER},
+      </if>
+      <if test="source != null" >
+        source = #{source,jdbcType=INTEGER},
+      </if>
+      <if test="sourceId != null" >
+        source_id = #{sourceId,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+   <update id="update" parameterType="com.dept.model.Emergency" >
+    update emergency set
+        emergency = #{emergency}
+    where did = #{did} and  source = #{source} and source_id = #{sourceId}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.dept.model.Emergency" >
+    update emergency
+    set did = #{did,jdbcType=INTEGER},
+      emergency = #{emergency,jdbcType=INTEGER},
+      source = #{source,jdbcType=INTEGER},
+      source_id = #{sourceId,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

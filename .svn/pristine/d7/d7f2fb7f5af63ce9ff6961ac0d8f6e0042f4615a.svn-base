@@ -1,0 +1,211 @@
+package com.home.model;
+
+import java.util.Date;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.schedule.model.Schedule;
+
+public class Announcement {
+    private Integer id;
+
+    private String title;
+
+    private String text;
+
+    private Date date;
+
+    private String type;
+
+    private Date startTime;
+
+    private Date endTime;
+
+    private String createBy;
+
+    private String file;
+    
+    private String[] files;
+
+    private Boolean state;
+
+    private String range;
+
+    private String invitation;
+    
+    private String Orderby;
+    
+    private Integer iid;
+    private Integer remove;
+    private Integer sid;
+    private List<Schedule> schedule;
+    private Integer uid;
+    private Integer accomplish;
+  
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title == null ? null : title.trim();
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text == null ? null : text.trim();
+    }
+
+   
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getCreateBy() {
+        return createBy;
+    }
+
+    public void setCreateBy(String createBy) {
+        this.createBy = createBy == null ? null : createBy.trim();
+    }
+
+    public String getFile() {
+        return file;
+    }
+
+    public void setFile(String file) {
+        this.file = file == null ? null : file.trim();
+    }
+
+    public Boolean getState() {
+        return state;
+    }
+
+    public void setState(Boolean state) {
+        this.state = state;
+    }
+
+    public String getRange() {
+        return range;
+    }
+
+    public void setRange(String range) {
+        this.range = range == null ? null : range.trim();
+    }
+
+    public String getInvitation() {
+        return invitation;
+    }
+
+    public void setInvitation(String invitation) {
+        this.invitation = invitation == null ? null : invitation.trim();
+    }
+
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+	public String getOrderby() {
+		return Orderby;
+	}
+
+	public void setOrderby(String orderby) {
+		Orderby = orderby;
+	}
+
+	public Integer getIid() {
+		return iid;
+	}
+
+	public void setIid(Integer iid) {
+		this.iid = iid;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public Integer getRemove() {
+		return remove;
+	}
+
+	public void setRemove(Integer remove) {
+		this.remove = remove;
+	}
+
+	public List<Schedule> getSchedule() {
+		return schedule;
+	}
+
+	public void setSchedule(List<Schedule> schedule) {
+		this.schedule = schedule;
+	}
+
+	public String[] getFiles() {
+		return files;
+	}
+
+	public void setFiles(String[] files) {
+		this.files = files;
+	}
+
+	public Integer getSid() {
+		return sid;
+	}
+
+	public void setSid(Integer sid) {
+		this.sid = sid;
+	}
+
+	public Integer getUid() {
+		return uid;
+	}
+
+	public void setUid(Integer uid) {
+		this.uid = uid;
+	}
+
+	public Integer getAccomplish() {
+		return accomplish;
+	}
+
+	public void setAccomplish(Integer accomplish) {
+		this.accomplish = accomplish;
+	}
+
+	
+
+	
+}

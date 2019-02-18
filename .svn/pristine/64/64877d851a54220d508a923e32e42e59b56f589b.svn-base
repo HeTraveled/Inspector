@@ -1,0 +1,26 @@
+package com.sys.mapper;
+
+import java.util.List;
+
+import com.sys.model.MesWechatRecord;
+import com.sys.service.MesWechatRecordService;
+
+public interface MesWechatRecordMapper {
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(MesWechatRecord record);
+
+    int insertSelective(MesWechatRecord record);
+
+    MesWechatRecord selectByPrimaryKey(Integer id);
+
+    int updateByPrimaryKeySelective(MesWechatRecord record);
+
+    int updateByPrimaryKey(MesWechatRecord record);
+    
+    Integer deletes(List<Integer> mesId);
+    
+	Integer creates(List<MesWechatRecord> mesWechatRecords);
+	
+	List<MesWechatRecord> selectid(Integer id);
+}

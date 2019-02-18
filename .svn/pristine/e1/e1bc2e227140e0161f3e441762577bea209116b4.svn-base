@@ -1,0 +1,9 @@
+	.banner .l-btn-text::after{
+									width: 6px;
+								    height: 6px;
+								    content: '';
+								    background: #fff;
+								    border-radius: 100%;
+								    position: absolute;
+								    top: 18px;
+								}

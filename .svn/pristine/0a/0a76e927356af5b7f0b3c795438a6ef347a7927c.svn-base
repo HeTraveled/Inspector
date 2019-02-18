@@ -1,0 +1,192 @@
+<%@ page contentType="text/html;charset=utf-8"%>
+<%@ taglib prefix="c"  uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+<!DOCTYPE HTML>
+<html>
+<head>
+
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    	<link href="<%=basePath%>jsAndcss/css/editor.css" rel="stylesheet" />
+    <link rel="stylesheet" href="<%=basePath%>jsAndcss/ymnets.easyui/themes/base/easyui.css" type="text/css"></link>
+	<link rel="stylesheet" href="<%=basePath%>ueditor-mini1.2.2/themes/default/_css/umeditor.css" type="text/css"></link>
+	<link rel="stylesheet" type="text/css" href="<%=basePath%>jsAndcss/ymnets.easyui/themes/base/easyui.css">
+	<link rel="stylesheet" type="text/css"
+	href="<%=basePath%>jsAndcss/ymnets.easyui/content/Site.css">
+	<link href="<%=basePath%>jsAndcss/ymnets.easyui/content/fontawesome/css/font-awesome.min.css" rel="stylesheet" /></head>
+	<script type="text/javascript" src="<%=basePath%>jsAndcss/ymnets.easyui/jquery.min.js"></script>
+	<script type="text/javascript" src="<%=basePath%>jsAndcss/ymnets.easyui/jquery.easyui.min.js"></script>
+    <link href="<%=basePath%>jsAndcss/ymnets.easyui/themes/skin-green.css" rel="stylesheet" />
+    <script
+	src="<%=basePath%>jsAndcss/ymnets.easyui/content/js/jquery.easyui.plus.js"></script>
+    <link rel="stylesheet" href="<%=basePath%>ueditor/themes/default/css/umeditor.css" type="text/css"></link>
+    <script type="text/javascript" src="<%=basePath%>ueditor/third-party/jquery.min.js"></script>
+    <script type="text/javascript" src="<%=basePath%>ueditor/umeditor.config.js"></script>
+    <script type="text/javascript" src="<%=basePath%>ueditor/umeditor.min.js"></script>
+    <script type="text/javascript" src="<%=basePath%>ueditor/umeditor.min.js"></script>
+    <script type="text/javascript" src="<%=basePath%>ueditor/lang/zh-cn/zh-cn.js"></script>
+    <script type="text/javascript" src="<%=basePath%>ueditor-mini1.2.2/umeditor.config.js" charset="utf-8"></script>
+    <script type="text/javascript" src="<%=basePath%>ueditor-mini1.2.2/editor_api.js" charset="utf-8"></script>
+    <script type="text/javascript" src="<%=basePath%>ueditor-mini1.2.2/lang/zh-cn/zh-cn.js"></script>
+    <script src="<%=basePath%>js/ajaxfileupload.js"></script>
+        <script src="<%=basePath%>js/url.js"></script>
+	<script
+	src="<%=basePath%>jsAndcss/ymnets.easyui/locale/easyui-lang-zh_CN.js"></script>
+</head>
+<style>
+td{border:solid #CCCCCC; border-width:0px 1px 1px 0px; padding:10px 20px;}
+table{border:solid #CCCCCC; border-width:1px 0px 0px 1px;font-size: 1.2em;}
+.content{
+	box-sizing: border-box;
+    border:1px solid #ddd;
+    border-radius: 5px;
+}
+.weekSummarize{
+	display: flex;
+    align-items: center;
+    border-bottom:1px solid #ddd
+    }
+    .weekSummarize:last-child{border-bottom:none;}
+    .contentLeft{
+    padding: 10px 20px;
+    color:#666;
+    }
+    
+    .contentLeft span{
+    	color:#333
+    }
+    .leadership{
+    	margin:5px 0;
+    }
+    .contentRight{    
+    	flex: 1; 
+    	padding:24px 0;
+    	border-left:1px solid #ddd;	
+    }
+    .monthItem{
+    	
+    }
+    .item{
+     	margin-bottom:5px;
+    }
+    .item:last-child{
+    	margin-bottom:0;
+    }
+    .plan{padding:5px;}
+    .text{
+    	margin-top:5px;
+    	color:#333
+    }
+</style>
+<body style="padding:20px; box-sizing: border-box;">
+		<%-- <table style="width: 100%;line-height: 200%;">
+			<thead>
+			
+			<font style="font-weight:bold;width: 100%;">时间：</font>${week[0].years}年第${week[0].weeks}周</td></tr>
+			<c:forEach items="${week}" var="lwnn" varStatus="status">
+				<tr id=><td colspan="2"><font style="font-weight:bold;" size="3px">${lwnn.departmentname }</font>
+				<br>
+				<div>
+				<font style="width:100%;"size="3px">分管领导：</font><font size="3px">${lwnn.leadershipname }</font>
+				</div>
+				<div>
+				<font style="width:100%;"size="3px">负责人：</font><font size="3px">${lwnn.leadershipname }</font>
+				</div>
+				<font style="font-weight:bold;width: 100%;"size="3px">计划列表：</font>
+				<c:forEach items="${lwnn.weekplan}" var="lwn" varStatus="status">
+				</br>
+				${ status.index+1}.
+				
+				期限：<fmt:formatDate value="${lwn.startTime}"  pattern="yyyy-MM-dd"/>至
+				<fmt:formatDate value="${lwn.endTime}"  pattern="yyyy-MM-dd"/>
+				
+				<c:if test="${lwn.state==1}">[ 进行中 ]</c:if>
+				<c:if test="${lwn.state==2}">[ 未完成 ]</c:if>
+				<c:if test="${lwn.state==3}">[ 已完成 ]</c:if>
+				${u.startTime}${u.endTime} <br>${lwn.body}
+				</c:forEach>
+				</td>
+				</tr>
+				</c:forEach>
+				
+			</thead>
+		</table> --%>
+		<div class="content">
+		<c:forEach items="${week}" var="lwnn" varStatus="status">
+			<div class="weekSummarize">
+				<div class="contentLeft">
+					<div class="department">部门：<span>${lwnn.departmentname}</span></div>
+					<div class="leadership">分管领导：<span>${lwnn.leadershipname}</span></div>
+					<div class="principal">部门负责人：<span>${lwnn.principalname}</span></div>
+				</div>
+				<c:forEach items="${lwnn.weekplan}" var="lwn" varStatus="status">
+				<div class="contentRight">
+					<ul class="monthItem">
+						<li class="item">
+							<div class="plan">
+								<div class="time">
+									${ status.index+1}.<span><fmt:formatDate value="${lwn.start_time}"  pattern="yyyy-MM-dd"/></span>&nbsp;至&nbsp;<span><fmt:formatDate value="${lwn.end_time}"  pattern="yyyy-MM-dd"/></span>
+								</div>
+							
+								<div class="text">${lwn.body}</div>
+							</div>
+						</li>
+					</ul>
+				</div>
+				</c:forEach>
+			</div>
+			</c:forEach>
+		</div>
+		
+	<script type="text/javascript">
+	
+	
+	function getWeekDate(){
+    let arrt=[];
+    for (var i = -6; i < 1; i++) {
+      arrt.push(this.getWeekDay(i));
+    }
+    return arrt.sort();
+  }
+  // 获取本周日期
+  function getWeekDay(n){
+    var now = new Date();
+    var year = now.getFullYear();
+    //因为月份是从0开始的,所以获取这个月的月份数要加1才行
+    var month = now.getMonth() + 1;	
+    var date = now.getDate();
+    var day = now.getDay();
+    if (day !== 0) {
+      n = n + (day - 1);
+    }else {
+      n = n + day;
+    }
+    if (day) {
+      //这个判断是为了解决跨年的问题
+      if (month > 1) {
+        month = month;
+         //这个判断是为了解决跨年的问题,月份是从0开始的
+      }else {
+        year = year - 1;
+        month = 12;
+      };
+    }
+    now.setDate(now.getDate() - n);	
+    year = now.getFullYear();
+    month = now.getMonth() + 1;
+    date = now.getDate();
+    let s = year + "-" + (month < 10 ? ('0' + month) : month) + "-" + (date < 10 ? ('0' + date) : date) ;
+    return s;
+  };
+		
+		
+	</script>
+	<div id="modalwindowContent" class="easyui-window"
+			data-options="modal:true,closed:true,minimizable:false,shadow:false,maximized:true"></div>
+</body>
+</html>

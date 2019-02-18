@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD SQL Map Config 3.0//EN"  
+	"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+<plugins>  
+    <!-- com.github.pagehelper为PageHelper类所在包名 -->  
+    <plugin interceptor="com.github.pagehelper.PageHelper">  
+        <!-- 该参数默认为false -->  
+        <!-- 设置为true时，会将RowBounds第一个参数offset当成pageNum页码使用 -->  
+        <!-- 和startPage中的pageNum效果一样-->  
+        <property name="offsetAsPageNum" value="true"/>  
+        <!-- 该参数默认为false -->  
+        <!-- 设置为true时，使用RowBounds分页会进行count查询 -->  
+        <property name="rowBoundsWithCount" value="true"/>  
+        <!-- 设置为true时，如果pageSize=0或者RowBounds.limit = 0就会查询出全部的结果 -->  
+        <!-- （相当于没有执行分页查询，但是返回结果仍然是Page类型）-->  
+        <property name="pageSizeZero" value="true"/>  	
+        <!-- 3.3.0版本可用 - 分页参数合理化，默认false禁用 -->  
+        <!-- 启用合理化时，如果pageNum<1会查询第一页，如果pageNum>pages会查询最后一页 -->  
+        <!-- 禁用合理化时，如果pageNum<1或pageNum>pages会返回空数据 -->  
+        <property name="reasonable" value="true"/>  
+    </plugin>  
+</plugins>  
+<mappers>
+<!-- 用户账号表 -->
+<mapper resource="resources/mybatis/home/UserMapper.xml" />
+<!-- 角色权限表 -->
+<mapper resource="resources/mybatis/home/RoleMapper.xml" />
+<!-- 用户分数表 -->
+<mapper resource="resources/mybatis/home/ScoreMapper.xml" />
+<!-- 部门表 -->
+<mapper resource="resources/mybatis/dept/DeptMapper.xml" />
+<!-- 紧急情况表 -->
+<mapper resource="resources/mybatis/dept/EmergencyMapper.xml" />
+<!-- 自添加紧急情况表 -->
+<mapper resource="resources/mybatis/dept/EmergencyRecordMapper.xml" />
+<!-- MENU菜单表 -->
+<mapper resource="resources/mybatis/home/MenuMapper.xml" />
+<!-- 协同文件表 -->
+<mapper resource="resources/mybatis/home/AnnouncementMapper.xml" />
+
+<!-- 协同文件状态表 -->
+<mapper resource="resources/mybatis/home/AnnouncementStateMapper.xml" />
+
+
+
+
+<!-- BUG反馈表 -->
+<mapper resource="resources/mybatis/sys/BugMapper.xml" />
+<!-- 公告小喇叭表 -->
+<mapper resource="resources/mybatis/sys/HornMapper.xml" />
+<!-- 制度表格表 -->
+<mapper resource="resources/mybatis/sys/RegulationsMapper.xml" />
+<!-- 日程表 -->
+<mapper resource="resources/mybatis/schedule/ScheduleMapper.xml" />
+<!-- 公文表 -->
+<mapper resource="resources/mybatis/official/OfficialArticleMapper.xml" />
+<!-- access token -->
+<mapper resource="resources/mybatis/wechat/TokenMapper.xml" />
+<!-- 消息个人表 -->
+<mapper resource="resources/mybatis/sys/MessageRemindMapper.xml" />
+<!-- 消息表 -->
+<mapper resource="resources/mybatis/sys/MessagesMapper.xml" />
+<!-- 微信端标语表 -->
+<mapper resource="resources/mybatis/sys/SloganMapper.xml" />
+<!-- 推送时间表 -->
+<mapper resource="resources/mybatis/sys/PropellingMapper.xml" />
+<!-- 微信模板消息表 -->
+<mapper resource="resources/mybatis/sys/MesWechatMapper.xml" />
+<!-- 微信模板消息个人表 -->
+<mapper resource="resources/mybatis/sys/MesWechatRecordMapper.xml" />
+<!-- 附件表 -->
+<mapper resource="resources/mybatis/sys/AttachmentsMapper.xml" />
+
+<!-- 督查事项 begin -->
+		<!-- 督查事项表 -->
+		<mapper resource="resources/mybatis/inspector/InspectorMapper.xml" />
+		<!--督查事项留言讨论表  -->
+		<mapper resource="resources/mybatis/inspector/InspectorMessageMapper.xml" />
+		<!--督查事项督办意见表  -->
+		<mapper resource="resources/mybatis/inspector/InspectorOpinionMapper.xml" />
+		<!--督查事项进展表  -->
+		<mapper resource="resources/mybatis/inspector/InspectorProgressMapper.xml" />
+		<!--督查事项修改记录表  -->
+		<mapper resource="resources/mybatis/inspector/InspectorRecordMapper.xml" />
+		<!--督查事项完成记录表  -->
+		<mapper resource="resources/mybatis/inspector/InspectorNameMapper.xml" />
+<!--督查事项 end  -->
+
+<!-- 工作计划 begin-->
+		<!-- 月计划 begin -->
+				<!-- 月计划-实际完成表 -->
+			
+				<!-- 月计划表 -->
+				<mapper resource="resources/mybatis/plan/MonthPlanMapper.xml" />
+				<!-- 月计划留言讨论表 -->
+				<mapper resource="resources/mybatis/plan/MonthPlanMessageMapper.xml" />
+				<!-- 月计划-下月计划表 -->
+				<mapper resource="resources/mybatis/plan/MonthPlanNextMapper.xml" />
+				<!-- 月计划-未完成表 -->
+				
+		<!-- 月计划 end -->
+		
+		<!-- 周计划 begin -->
+				<!-- 周计划-实际完成表 -->
+				
+				<!-- 周计划表 -->
+				<mapper resource="resources/mybatis/plan/WeeksPlanMapper.xml" />
+				<!-- 周计划留言讨论表 -->
+				<mapper resource="resources/mybatis/plan/WeeksPlanMessageMapper.xml" />
+				<!-- 周计划-下月计划表 -->
+				<mapper resource="resources/mybatis/plan/WeeksPlanNextMapper.xml" />
+				<!-- 周计划-未完成表 -->
+				
+				<mapper resource="resources/mybatis/plan/YearPlanMapper.xml" />
+				<mapper resource="resources/mybatis/plan/YearPlanNextMapper.xml" />
+				
+		<!-- 周计划 end -->
+<!-- 工作计划 end -->
+
+</mappers>
+</configuration>

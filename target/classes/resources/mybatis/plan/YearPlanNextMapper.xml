@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.plan.mapper.YearPlanNextMapper" >
+  <resultMap id="BaseResultMap" type="com.plan.model.YearPlanNext" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="yid" property="yid" jdbcType="INTEGER" />
+    <result column="body" property="body" jdbcType="VARCHAR" />
+    <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, yid, body, start_time, end_time, state
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from year_plan_next
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from year_plan_next
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.plan.model.YearPlanNext" >
+    insert into year_plan_next (id, yid, body, 
+      start_time, end_time, state
+      )
+    values (#{id,jdbcType=INTEGER}, #{yid,jdbcType=INTEGER}, #{body,jdbcType=VARCHAR}, 
+      #{startTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, #{state,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.plan.model.YearPlanNext" >
+    insert into year_plan_next
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="yid != null" >
+        yid,
+      </if>
+      <if test="body != null" >
+        body,
+      </if>
+      <if test="startTime != null" >
+        start_time,
+      </if>
+      <if test="endTime != null" >
+        end_time,
+      </if>
+      <if test="state != null" >
+        state,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="yid != null" >
+        #{yid,jdbcType=INTEGER},
+      </if>
+      <if test="body != null" >
+        #{body,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null" >
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.plan.model.YearPlanNext" >
+    update year_plan_next
+    <set >
+      <if test="yid != null" >
+        yid = #{yid,jdbcType=INTEGER},
+      </if>
+      <if test="body != null" >
+        body = #{body,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null" >
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.plan.model.YearPlanNext" >
+    update year_plan_next
+    set yid = #{yid,jdbcType=INTEGER},
+      body = #{body,jdbcType=VARCHAR},
+      start_time = #{startTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      state = #{state,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectall" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from year_plan_next
+    where yid = #{yid,jdbcType=INTEGER}
+  </select>
+  <insert id="creatyearplannext" parameterType="java.util.List" >
+    insert into year_plan_next (id, yid, body, 
+      start_time, end_time, state
+      )values 
+    <foreach collection="list" item="item" index="index"
+			separator=",">
+    (null, 
+    #{item.yid,jdbcType=INTEGER}, 
+    #{item.body,jdbcType=VARCHAR}, 
+      #{item.startTime,jdbcType=TIMESTAMP}, 
+      #{item.endTime,jdbcType=TIMESTAMP}, 
+      #{item.state,jdbcType=INTEGER}
+      )
+      </foreach>
+  </insert>
+  <select id="selectbykey" parameterType="com.plan.model.YearPlanNext" resultMap="BaseResultMap">
+ SELECT
+	y.*,d.departmentname
+	from year_plan_next y,department d
+	WHERE
+	y.state=d.id
+   AND yid = #{yid,jdbcType=INTEGER}
+   and state= #{did,jdbcType=INTEGER}
+   </select>
+    <select id="selectgroup" parameterType="com.plan.model.YearPlanNext" resultMap="BaseResultMap">
+    select state from year_plan_next 
+
+	WHERE yid=#{yid,jdbcType=INTEGER} GROUP BY state
+    </select>
+   <select id="selectbydept" parameterType="com.plan.model.YearPlanNext" resultMap="BaseResultMap">
+ SELECT
+	y.*,d.departmentname
+	from year_plan_next y,department d
+	WHERE
+	y.state=d.id
+	and state=#{did,jdbcType=INTEGER}
+   AND yid = #{yid,jdbcType=INTEGER}
+   </select>
+   <select id="yearplannextoverdue" resultMap="BaseResultMap">
+  	select 
+  	 <include refid="Base_Column_List" />
+  	 from year_plan_next
+  	 where state=1
+  	 and now()>end_time
+  </select>
+</mapper>

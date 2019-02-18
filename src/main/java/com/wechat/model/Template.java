@@ -1,0 +1,171 @@
+package com.wechat.model;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.ConnectException;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.util.List;
+
+import javax.net.ssl.HttpsURLConnection;
+
+import com.util.Log;
+
+import net.sf.json.JSONObject;
+
+public class Template {  
+	  
+    // 消息接收方  
+    private String toUser;  
+    // 模板id  
+    private String templateId;  
+    // 模板消息详情链接  
+    private String url;  
+    // 消息顶部的颜色  
+    private String topColor;  
+    // 参数列表  
+    private List<TemplateParam> templateParamList;  
+    //省略getter、setter方法
+    
+    //按微信接口要求格式化模板
+    public String toJSON() {  
+        StringBuffer buffer = new StringBuffer();  
+        buffer.append("{");  
+        buffer.append(String.format("\"touser\":\"%s\"", this.toUser)).append(",");  
+        buffer.append(String.format("\"template_id\":\"%s\"", this.templateId)).append(",");  
+        buffer.append(String.format("\"url\":\"%s\"", this.url)).append(",");  
+        buffer.append(String.format("\"topcolor\":\"%s\"", this.topColor)).append(",");  
+        buffer.append("\"data\":{");  
+        TemplateParam param = null;  
+        for (int i = 0; i < this.templateParamList.size(); i++) {  
+             param = templateParamList.get(i);  
+            // 判断是否追加逗号  
+            if (i < this.templateParamList.size() - 1){  
+                  
+                buffer.append(String.format("\"%s\": {\"value\":\"%s\",\"color\":\"%s\"},", param.getName(), param.getValue(), param.getColor()));  
+            }else{  
+                buffer.append(String.format("\"%s\": {\"value\":\"%s\",\"color\":\"%s\"}", param.getName(), param.getValue(), param.getColor()));  
+            }  
+          
+        }  
+        buffer.append("}");  
+        buffer.append("}");  
+        return buffer.toString();  
+    }  
+
+	public String getTemplateId() {
+		return templateId;
+	}
+	public void setTemplateId(String templateId) {
+		this.templateId = templateId;
+	}
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	public String getTopColor() {
+		return topColor;
+	}
+	public void setTopColor(String topColor) {
+		this.topColor = topColor;
+	}
+	public List<TemplateParam> getTemplateParamList() {
+		return templateParamList;
+	}
+	public void setTemplateParamList(List<TemplateParam> templateParamList) {
+		this.templateParamList = templateParamList;
+	}
+	
+	public String getToUser() {
+		return toUser;
+	}
+
+	public void setToUser(String toUser) {
+		this.toUser = toUser;
+	}
+
+public static  JSONObject  sendTemplateMsg(Template template,String accessToken){  
+        
+        String requestUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=ACCESS_TOKEN";
+        requestUrl=requestUrl.replace("ACCESS_TOKEN", accessToken);  
+        //发送模板消息,返回json格式结果
+        JSONObject jsonObject = httpsRequestToJsonObject(requestUrl, "POST", template.toJSON(),false);  
+        return jsonObject; 
+    } 
+public static JSONObject httpsRequestToJsonObject(String requestUrl, String requestMethod, String outputStr,boolean needCert) {
+    JSONObject jsonObject = null;
+    try {
+         StringBuffer buffer = httpsRequest(requestUrl, requestMethod, outputStr,needCert);
+        jsonObject = JSONObject.fromObject(buffer.toString());
+    } catch (ConnectException ce) {
+    	 Log.getLogger().error(ce.getMessage(),ce);  
+    } catch (Exception e) {
+    	 Log.getLogger().error(e.getMessage(),e);  
+    }
+    
+    return jsonObject;
+}
+/**
+ * 
+ * @param requestUrl     接口地址
+ * @param requestMethod  请求方法：POST、GET...
+ * @param output         接口入参
+ * @param needCert       是否需要数字证书
+ * @return
+ */
+private static StringBuffer httpsRequest(String requestUrl, String requestMethod, String output,boolean needCert)
+        throws NoSuchAlgorithmException, NoSuchProviderException, KeyManagementException, MalformedURLException,
+        IOException, ProtocolException, UnsupportedEncodingException {
+    
+    
+    URL url = new URL(requestUrl);
+    HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
+    
+    //是否需要数字证书
+    if(needCert){
+        //设置数字证书
+        setCert(connection);
+    }
+    connection.setDoOutput(true);
+    connection.setDoInput(true);
+    connection.setUseCaches(false);
+    connection.setRequestMethod(requestMethod);
+    if (null != output) {
+        OutputStream outputStream = connection.getOutputStream();
+        outputStream.write(output.getBytes("UTF-8"));
+        outputStream.close();
+    }
+
+    // 从输入流读取返回内容
+    InputStream inputStream = connection.getInputStream();
+    InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "utf-8");
+    BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+    String str = null;
+    StringBuffer buffer = new StringBuffer();
+    while ((str = bufferedReader.readLine()) != null) {
+        buffer.append(str);
+    }
+
+    bufferedReader.close();
+    inputStreamReader.close();
+    inputStream.close();
+    inputStream = null;
+    connection.disconnect();
+    return buffer;
+}
+
+private static void setCert(HttpsURLConnection connection) {
+	// TODO Auto-generated method stub
+	
+}
+}

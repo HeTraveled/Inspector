@@ -1,0 +1,11 @@
+jdbc.driver=com.mysql.jdbc.Driver
+jdbc.url=jdbc:mysql://192.168.0.11:3309/inspector
+jdbc.username=root
+jdbc.password=root
+
+model.package=com.home.model
+mapper.package=com.home.mapper
+xml.package=resources.mybatis.home
+target.project=src
+table.name=announcement_state
+object.name=AnnouncementState

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.inspector.mapper.InspectorNameMapper" >
+  <resultMap id="BaseResultMap" type="com.inspector.model.InspectorName" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="iid" property="iid" jdbcType="INTEGER" />
+    <result column="responsibility" property="responsibility" jdbcType="VARCHAR" />
+    <result column="assist_dept" property="assistDept" jdbcType="VARCHAR" />
+    <result column="charge" property="charge" jdbcType="VARCHAR" />
+    <result column="leadership" property="leadership" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, iid, responsibility, assist_dept, charge, leadership
+  </sql>
+  <select id="selectid" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  	   select 
+    <include refid="Base_Column_List" />
+    from inspector_name
+    where iid = #{iid,jdbcType=INTEGER}
+  </select>
+  <delete id="delete" parameterType="java.lang.Integer">
+  	delete from inspector_name where iid=#{iid}
+  </delete>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from inspector_name
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from inspector_name
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.inspector.model.InspectorName" >
+    insert into inspector_name (id, iid, responsibility, 
+      assist_dept, charge, leadership
+      )
+    values (#{id,jdbcType=INTEGER}, #{iid,jdbcType=INTEGER}, #{responsibility,jdbcType=VARCHAR}, 
+      #{assistDept,jdbcType=VARCHAR}, #{charge,jdbcType=VARCHAR}, #{leadership,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.inspector.model.InspectorName" >
+    insert into inspector_name
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="iid != null" >
+        iid,
+      </if>
+      <if test="responsibility != null" >
+        responsibility,
+      </if>
+      <if test="assistDept != null" >
+        assist_dept,
+      </if>
+      <if test="charge != null" >
+        charge,
+      </if>
+      <if test="leadership != null" >
+        leadership,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="iid != null" >
+        #{iid,jdbcType=INTEGER},
+      </if>
+      <if test="responsibility != null" >
+        #{responsibility,jdbcType=VARCHAR},
+      </if>
+      <if test="assistDept != null" >
+        #{assistDept,jdbcType=VARCHAR},
+      </if>
+      <if test="charge != null" >
+        #{charge,jdbcType=VARCHAR},
+      </if>
+      <if test="leadership != null" >
+        #{leadership,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.inspector.model.InspectorName" >
+    update inspector_name
+    <set >
+      <if test="iid != null" >
+        iid = #{iid,jdbcType=INTEGER},
+      </if>
+      <if test="responsibility != null" >
+        responsibility = #{responsibility,jdbcType=VARCHAR},
+      </if>
+      <if test="assistDept != null" >
+        assist_dept = #{assistDept,jdbcType=VARCHAR},
+      </if>
+      <if test="charge != null" >
+        charge = #{charge,jdbcType=VARCHAR},
+      </if>
+      <if test="leadership != null" >
+        leadership = #{leadership,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.inspector.model.InspectorName" >
+    update inspector_name
+    set iid = #{iid,jdbcType=INTEGER},
+      responsibility = #{responsibility,jdbcType=VARCHAR},
+      assist_dept = #{assistDept,jdbcType=VARCHAR},
+      charge = #{charge,jdbcType=VARCHAR},
+      leadership = #{leadership,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

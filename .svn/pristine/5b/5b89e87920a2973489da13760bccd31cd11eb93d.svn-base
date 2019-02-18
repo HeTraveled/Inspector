@@ -1,0 +1,47 @@
+package com.plan.service.impl;
+
+import java.util.List;
+
+import com.github.pagehelper.PageHelper;
+import com.plan.mapper.WeeksPlanMessageMapper;
+import com.plan.model.WeeksPlan;
+import com.plan.model.WeeksPlanMessage;
+import com.plan.service.WeeksPlanMessageSerivce;
+import com.util.page.BeanUtil;
+import com.util.page.PagedResult;
+
+public class WeeksPlanMessageImpl implements WeeksPlanMessageSerivce {
+
+	private WeeksPlanMessageMapper weeksPlanMessageMapper;
+
+	public WeeksPlanMessageMapper getWeeksPlanMessageMapper() {
+		return weeksPlanMessageMapper;
+	}
+
+	public void setWeeksPlanMessageMapper(
+			WeeksPlanMessageMapper weeksPlanMessageMapper) {
+		this.weeksPlanMessageMapper = weeksPlanMessageMapper;
+	}
+	
+	@Override
+	public int creatweekplanmessage(WeeksPlanMessage weeksplanmessage) {
+		
+		return weeksPlanMessageMapper.insertSelective(weeksplanmessage) ;
+	}
+
+	@Override
+	public List<WeeksPlanMessage> selectthree(int wid) {
+	
+		return weeksPlanMessageMapper.selectByPrimaryKey(wid);
+	}
+
+	@Override
+	public PagedResult<WeeksPlanMessage> selectall(Integer wid,Integer pageNo, Integer pageSize) {
+
+		pageNo = pageNo == null?1:pageNo;  
+	    pageSize = pageSize == null?10:pageSize;  
+    PageHelper.startPage(pageNo,pageSize);
+    return BeanUtil.toPagedResult(weeksPlanMessageMapper.selectall(wid));
+	}
+
+}

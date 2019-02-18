@@ -1,0 +1,274 @@
+package com.inspector.service.impl;
+
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+
+import com.dept.mapper.DeptMapper;
+import com.github.pagehelper.PageHelper;
+import com.home.mapper.UserMapper;
+import com.home.model.User;
+import com.inspector.mapper.InspectorMapper;
+import com.inspector.mapper.InspectorRecordMapper;
+import com.inspector.model.Inspector;
+import com.inspector.model.InspectorRecord;
+import com.inspector.service.InspectorService;
+import com.util.StringtoInt;
+import com.util.page.BeanUtil;
+import com.util.page.PagedResult;
+
+
+public class InspectorImpl implements InspectorService {
+	
+	private InspectorMapper inspectorMapper;
+	
+	private InspectorRecordMapper inspectorRecordMapper;
+	
+	private DeptMapper deptMapper;
+	
+	private UserMapper userMapper;
+
+	
+	public InspectorMapper getInspectorMapper() {
+		return inspectorMapper;
+	}
+
+	public void setInspectorMapper(InspectorMapper inspectorMapper) {
+		this.inspectorMapper = inspectorMapper;
+	}
+
+	public InspectorRecordMapper getInspectorRecordMapper() {
+		return inspectorRecordMapper;
+	}
+
+	public void setInspectorRecordMapper(InspectorRecordMapper inspectorRecordMapper) {
+		this.inspectorRecordMapper = inspectorRecordMapper;
+	}
+
+	@Override
+	public Integer create(Inspector inspector) {
+		inspectorMapper.insertSelective(inspector);
+		return inspector.getIid();
+	}
+	
+	
+	public DeptMapper getDeptMapper() {
+		return deptMapper;
+	}
+
+	public void setDeptMapper(DeptMapper deptMapper) {
+		this.deptMapper = deptMapper;
+	}
+
+	
+	public UserMapper getUserMapper() {
+		return userMapper;
+	}
+
+	public void setUserMapper(UserMapper userMapper) {
+		this.userMapper = userMapper;
+	}
+
+	@Override
+	public PagedResult<Inspector> display(Inspector inspector, Integer pageNo,
+			Integer pageSize) {
+		pageNo = pageNo == null?1:pageNo;  
+	    pageSize = pageSize == null?10:pageSize;  
+    PageHelper.startPage(pageNo,pageSize);
+    return BeanUtil.toPagedResult(inspectorMapper.display(inspector));
+	}
+
+	@Override
+	public Inspector selectid(Integer iid) {
+		return inspectorMapper.selectByPrimaryKey(iid);
+	}
+
+	@Override
+	public Integer update(Inspector inspector,HttpServletRequest request) {
+		//添加修改记录
+		Inspector old=inspectorMapper.selectByPrimaryKey(inspector.getIid());
+		StringBuffer sb=new StringBuffer();
+		//来源
+		if(!old.getSource().equals(inspector.getSource())){
+			sb.append("<font style='font-weight: bold;color:red;'>事项来源</font>由<font style='font-weight: bold;'>");
+			sb.append(old.getSource());
+			sb.append("</font>修改为<font style='font-weight: bold;'>");
+			sb.append(inspector.getSource());
+			sb.append("</font><br>");
+		}
+		//类型
+		if(old.getType().intValue()!=inspector.getType().intValue()){
+			String type1="会议",type2="金宏网",type3="专项督查",type4="其他";
+			sb.append("<font style='font-weight: bold;color:red;'>督查类型</font>由<font style='font-weight: bold;'>");
+			if(old.getType()==1)sb.append(type1);
+			else if(old.getType()==2)sb.append(type2);
+			else if(old.getType()==3)sb.append(type3);
+			else if(old.getType()==4)sb.append(type4);
+			sb.append("</font>修改为<font style='font-weight: bold;'>");
+			if(inspector.getType()==1)sb.append(type1);
+			else if(inspector.getType()==2)sb.append(type2);
+			else if(inspector.getType()==3)sb.append(type3);
+			else if(inspector.getType()==4)sb.append(type4);
+			sb.append("</font><br>");
+		}
+		//责任单位
+		if(old.getResponsibility().intValue()!=inspector.getResponsibility().intValue()){
+			sb.append("<font style='font-weight: bold;color:red;'>责任单位</font>由<font style='font-weight: bold;'>");
+			sb.append(deptMapper.selectByPrimaryKey(old.getResponsibility()).getDepartmentname());
+			sb.append("</font>修改为<font style='font-weight: bold;'>");
+			sb.append(deptMapper.selectByPrimaryKey(inspector.getResponsibility()).getDepartmentname());
+			sb.append("</font><br>");
+		}
+					if(old.getLeadership().intValue()==0&&inspector.getLeadership().intValue()!=0){
+						sb.append("<font style='font-weight: bold;color:red;'>协办领导</font>由<font style='font-weight: bold;'>");
+						sb.append(userMapper.selectByPrimaryKey(old.getLeadership()).getName());
+						sb.append("</font>修改为<font style='font-weight: bold;'>");
+						sb.append(userMapper.selectByPrimaryKey(inspector.getLeadership()).getName());
+						sb.append("</font><br>");
+					}
+					else if(old.getLeadership().intValue()!=0&&inspector.getLeadership().intValue()==0){
+						sb.append("<font style='font-weight: bold;color:red;'>协办领导</font>由<font style='font-weight: bold;'>");
+						sb.append(userMapper.selectByPrimaryKey(old.getLeadership()).getName());
+						sb.append("</font>修改为<font style='font-weight: bold;'>");
+						sb.append(userMapper.selectByPrimaryKey(inspector.getLeadership()).getName());
+						sb.append("</font><br>");
+					}
+					//协办领导 选填项 需要判断
+					else if(old.getLeadership().intValue()!=inspector.getLeadership().intValue()){
+						sb.append("<font style='font-weight: bold;color:red;'>协办领导</font>由<font style='font-weight: bold;'>");
+						sb.append(userMapper.selectByPrimaryKey(old.getLeadership()).getName());
+						sb.append("</font>修改为<font style='font-weight: bold;'>");
+						sb.append(userMapper.selectByPrimaryKey(inspector.getLeadership()).getName());
+						sb.append("</font><br>");
+					}
+		//反馈频率
+				if(old.getFrequency().intValue()!=inspector.getFrequency().intValue()){
+					String type1="日",type2="周",type3="月";
+					sb.append("<font style='font-weight: bold;color:red;'>反馈频率</font>由<font style='font-weight: bold;'>");
+					if(old.getFrequency()==1)sb.append(type1);
+					else if(old.getFrequency()==2)sb.append(type2);
+					else if(old.getFrequency()==3)sb.append(type3);
+					sb.append("</font>修改为<font style='font-weight: bold;'>");
+					if(inspector.getFrequency()==1)sb.append(type1);
+					else if(inspector.getFrequency()==2)sb.append(type2);
+					else if(inspector.getFrequency()==3)sb.append(type3);
+					sb.append("</font><br>");
+				}
+				//开始时间
+				if(old.getStartTime().compareTo(inspector.getStartTime())!=0){
+					sb.append("<font style='font-weight: bold;color:red;'>开始时间</font>由<font style='font-weight: bold;'>");
+					String date1=old.getStartTime().toLocaleString();
+					date1=date1.substring(0,date1.indexOf(" "));
+					String date2=inspector.getStartTime().toLocaleString();
+					date2=date2.substring(0,date2.indexOf(" "));
+					sb.append(date1);
+					sb.append("</font>修改为<font style='font-weight: bold;'>");
+					sb.append(date2);
+					sb.append("</font><br>");
+				}
+				//完成时限
+				if(old.getEndTime().compareTo(inspector.getEndTime())!=0){
+					sb.append("<font style='font-weight: bold;color:red;'>完成时限</font>由<font style='font-weight: bold;'>");
+					String date1=old.getEndTime().toLocaleString();
+					date1=date1.substring(0,date1.indexOf(" "));
+					String date2=inspector.getEndTime().toLocaleString();
+					date2=date2.substring(0,date2.indexOf(" "));
+					sb.append(date1);
+					sb.append("</font>修改为<font style='font-weight: bold;'>");
+					sb.append(date2);
+					sb.append("</font><br>");
+				}
+				//协助单位 选填项 如果前期为空后期添加也需要做判断
+				if(!old.getAssistDept().equals(inspector.getAssistDept())){
+					String[] olddept=old.getAssistDept().split(",");
+					String[] newdept=inspector.getAssistDept().split(",");
+					StringBuffer sb1=new StringBuffer();
+					StringBuffer sb2=new StringBuffer();
+					 if(!old.getAssistDept().equals("")&&old.getAssistDept()!=null){
+					 for (int i =0;i<olddept.length;i++) {
+				            if(i==0)sb1.append(deptMapper.selectByPrimaryKey(Integer.parseInt(olddept[i])).getDepartmentname());
+				            else sb1.append(","+deptMapper.selectByPrimaryKey(Integer.parseInt(olddept[i])).getDepartmentname());
+				        }
+				}
+					 if(!inspector.getAssistDept().equals("")&&inspector.getAssistDept()!=null){
+					 for (int i =0;i<newdept.length;i++) {
+				            if(i==0)sb2.append(deptMapper.selectByPrimaryKey(Integer.parseInt(newdept[i])).getDepartmentname());
+				            else sb2.append(","+deptMapper.selectByPrimaryKey(Integer.parseInt(newdept[i])).getDepartmentname());
+				        }
+				}
+					sb.append("<font style='font-weight: bold;color:red;'>协助单位</font>由<font style='font-weight: bold;'>");
+					sb.append(sb1.toString());
+					sb.append("</font>修改为<font style='font-weight: bold;'>");
+					sb.append(sb2.toString());
+					sb.append("</font><br>");
+				}
+		User user=(User)request.getSession().getAttribute("user");
+		if(!sb.toString().equals("")){
+		inspectorRecordMapper.insertSelective(new InspectorRecord(inspector.getIid(), new Date(), user.getName(), sb.toString()));
+		}
+		return inspectorMapper.updateByPrimaryKeySelective(inspector);
+	}
+
+	@Override
+	public Integer delete(Integer iid) {
+		return inspectorMapper.deleteByPrimaryKey(iid);
+	}
+
+	@Override
+	public Integer state(Integer state,Integer iid) {
+		//完成事项更新完成时间
+		if(state==5)inspectorMapper.updateByPrimaryKeySelective(new Inspector(iid,new Date()));
+		return inspectorMapper.state(state,iid);
+	}
+
+	@Override
+	public List<Inspector> homePageTop6(Inspector inspector) {
+		return inspectorMapper.homePageTop6(inspector);
+	}
+
+	@Override
+	public Integer progressNum(Inspector inspector) {
+		return inspectorMapper.progressNum(inspector);
+	}
+
+	@Override
+	public Integer expireNum(Inspector inspector) {
+		return inspectorMapper.expireNum(inspector);
+	}
+
+	@Override
+	public Integer update(Inspector inspector) {
+		return inspectorMapper.updateByPrimaryKeySelective(inspector);
+	}
+
+	@Override
+	public List<Inspector> overdue() {
+		return inspectorMapper.overdue();
+	}
+
+	@Override
+	public Integer updateOverdue(List<Integer> iid) {
+		return inspectorMapper.updateOverdue(iid);
+	}
+
+	@Override
+	public List<Inspector> feedback(Integer frequency) {
+		return inspectorMapper.feedback(frequency);
+	}
+
+	@Override
+	public PagedResult<Object> insEmergency(Integer did, Integer emergency,Integer pageNo,Integer pageSize) {
+		pageNo = pageNo == null?1:pageNo;  
+	    pageSize = pageSize == null?10:pageSize;  
+    PageHelper.startPage(pageNo,pageSize);
+    return BeanUtil.toPagedResult(inspectorMapper.insEmergency(did, emergency));
+	}
+
+	@Override
+	public List<Object> insEmergencyTop5(Integer did, Integer emergency) {
+		return inspectorMapper.insEmergencyTop5(did, emergency);
+	}
+	
+}

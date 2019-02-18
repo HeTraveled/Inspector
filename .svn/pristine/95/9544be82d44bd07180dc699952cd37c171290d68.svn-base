@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+     xmlns="http://www.springframework.org/schema/beans"  
+     xsi:schemaLocation="http://www.springframework.org/schema/beans 
+     http://www.springframework.org/schema/beans/spring-beans-4.2.xsd">
+     
+	<bean id="userService" class="com.home.service.Impl.UserImpl">
+		<property name="userMapper" ref="userMapper" />
+	</bean>
+		<bean id="roleService" class="com.home.service.Impl.RoleImpl">
+		<property name="roleMapper" ref="roleMapper" />
+	</bean>
+		<bean id="menuService" class="com.home.service.Impl.MenuImpl">
+		<property name="menuMapper" ref="menuMapper" />
+	</bean>
+	    <bean id="announcementService" class="com.home.service.Impl.AnnouncementImpl">
+		<property name="announcementMapper" ref="announcementMapper" />
+	</bean>
+		    <bean id="scoreService" class="com.home.service.Impl.ScoreImpl">
+		<property name="scoreMapper" ref="scoreMapper" />
+	</bean>
+	    <bean id="wechatService" class="com.wechat.service.impl.WechatImpl">
+	</bean>
+
+	  <bean id="announcementStateService" class="com.home.service.Impl.AnnouncementStateImpl">
+		<property name="announcementStateMapper" ref="announcementStateMapper" />
+	</bean>
+
+</beans>

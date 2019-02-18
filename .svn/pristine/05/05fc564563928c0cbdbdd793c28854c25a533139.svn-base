@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+     xmlns="http://www.springframework.org/schema/beans"  
+     xsi:schemaLocation="http://www.springframework.org/schema/beans 
+     http://www.springframework.org/schema/beans/spring-beans-4.2.xsd">
+     
+	<bean id="hornService" class="com.sys.service.impl.HornImpl">
+		<property name="hornMapper" ref="hornMapper" />
+	</bean>
+			<bean id="tokenService" class="com.wechat.service.impl.TokenImpl">
+		<property name="tokenMapper" ref="tokenMapper" />
+	</bean>
+		<bean id="regulationsService" class="com.sys.service.impl.RegulationsImpl">
+		<property name="regulationsMapper" ref="regulationsMapper" />
+	</bean>
+			<bean id="messageRemindService" class="com.sys.service.impl.MessageRemindImpl">
+		<property name="messageRemindMapper" ref="messageRemindMapper" />
+	</bean>
+			<bean id="messagesService" class="com.sys.service.impl.MessagesImpl">
+		<property name="messagesMapper" ref="messagesMapper" />
+	</bean>
+			<bean id="sloganService" class="com.sys.service.impl.SloganImpl">
+		<property name="sloganMapper" ref="sloganMapper" />
+	</bean>
+		<bean id="propellingService" class="com.sys.service.impl.PropellingImpl">
+		<property name="propellingMapper" ref="propellingMapper" />
+	</bean>
+			<bean id="mesWechatService" class="com.sys.service.impl.MesWechatImpl">
+		<property name="mesWechatMapper" ref="mesWechatMapper" />
+	</bean>
+	<bean id="mesWechatRecordService" class="com.sys.service.impl.MesWechatRecordImpl">
+		<property name="mesWechatRecordMapper" ref="mesWechatRecordMapper" />
+	</bean>
+		<bean id="attachmentsService" class="com.sys.service.impl.AttachmentsImpl">
+		<property name="attachmentsMapper" ref="attachmentsMapper" />
+	</bean>
+			<bean id="bugService" class="com.sys.service.impl.BugImpl">
+		<property name="bugMapper" ref="bugMapper" />
+	</bean>
+</beans>

@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.home.mapper.AnnouncementMapper">
+	<resultMap id="BaseResultMap" type="com.home.model.Announcement">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="title" property="title" jdbcType="VARCHAR" />
+		<result column="text" property="text" jdbcType="VARCHAR" />
+		<result column="date" property="date" jdbcType="TIMESTAMP" />
+		<result column="type" property="type" jdbcType="VARCHAR" />
+		<result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+		<result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+		<result column="create_by" property="createBy" jdbcType="VARCHAR" />
+		<result column="file" property="file" jdbcType="VARCHAR" />
+		<result column="state" property="state" jdbcType="BIT" />
+		<result column="remove" property="remove" jdbcType="INTEGER" />
+		<result column="sid" property="sid" jdbcType="INTEGER" />
+		<result column="uid" property="uid" jdbcType="INTEGER" />
+		<result column="accomplish" property="accomplish" jdbcType="INTEGER" />
+		<result column="range" property="range" jdbcType="VARCHAR" />
+		<result column="invitation" property="invitation" jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, title, text, date, type, start_time, end_time, create_by, file,
+		state, `range`,
+		invitation,remove,sid,uid,accomplish
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from announcement
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+	<delete id="delete" parameterType="java.util.List">
+		delete from announcement where aid in
+		<foreach collection="list" item="aid" index="index" open="("
+			separator="," close=")">
+			#{aid}
+		</foreach>
+	</delete>
+	<insert id="insert" parameterType="com.home.model.Announcement">
+		insert into announcement (id, title, text,
+		date, type, start_time,
+		end_time, create_by, file,
+		state, `range`, invitation,remove,sid,uid,accomplish
+		)
+		values (#{id,jdbcType=INTEGER}, #{title,jdbcType=VARCHAR},
+		#{text,jdbcType=VARCHAR},
+		#{date,jdbcType=TIMESTAMP}, #{type,jdbcType=VARCHAR}, #{startTime,jdbcType=TIMESTAMP},
+		#{endTime,jdbcType=TIMESTAMP}, #{createBy,jdbcType=VARCHAR},
+		#{file,jdbcType=VARCHAR},
+		#{state,jdbcType=BIT}, #{range,jdbcType=VARCHAR}, #{invitation,jdbcType=VARCHAR},
+		#{remove,jdbcType=INTEGER},
+		#{sid,jdbcType=INTEGER},#{uid,jdbcType=INTEGER},#{accomplish,jdbcType=INTEGER}
+		)
+
+	</insert>
+	<insert id="insertSelective" parameterType="com.home.model.Announcement">
+		<selectKey resultType="java.lang.Integer" order="AFTER"
+			keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		insert into announcement
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="title != null">
+				title,
+			</if>
+			<if test="text != null">
+				text,
+			</if>
+			<if test="date != null">
+				date,
+			</if>
+			<if test="type != null">
+				type,
+			</if>
+			<if test="startTime != null">
+				start_time,
+			</if>
+			<if test="endTime != null">
+				end_time,
+			</if>
+			<if test="createBy != null">
+				create_by,
+			</if>
+			<if test="file != null">
+				file,
+			</if>
+			<if test="state != null">
+				state,
+			</if>
+			<if test="range != null">
+				`range`,
+			</if>
+			<if test="invitation != null">
+				invitation,
+			</if>
+			<if test="remove != null">
+				remove,
+			</if>
+			<if test="sid != null">
+				sid,
+			</if>
+			<if test="uid != null">
+				uid,
+			</if>
+			<if test="accomplish != null">
+				accomplish,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="title != null">
+				#{title,jdbcType=VARCHAR},
+			</if>
+			<if test="text != null">
+				#{text,jdbcType=VARCHAR},
+			</if>
+			<if test="date != null">
+				#{date,jdbcType=TIMESTAMP},
+			</if>
+			<if test="type != null">
+				#{type,jdbcType=VARCHAR},
+			</if>
+			<if test="startTime != null">
+				#{startTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="endTime != null">
+				#{endTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createBy != null">
+				#{createBy,jdbcType=VARCHAR},
+			</if>
+			<if test="file != null">
+				#{file,jdbcType=VARCHAR},
+			</if>
+			<if test="state != null">
+				#{state,jdbcType=BIT},
+			</if>
+			<if test="range != null">
+				#{range,jdbcType=VARCHAR},
+			</if>
+			<if test="invitation != null">
+				#{invitation,jdbcType=VARCHAR},
+			</if>
+			<if test="remove != null">
+				#{remove,jdbcType=INTEGER},
+			</if>
+			<if test="sid != null">
+				#{sid,jdbcType=INTEGER},
+			</if>
+			<if test="uid != null">
+				#{uid,jdbcType=INTEGER},
+			</if>
+			<if test="accomplish != null">
+				#{accomplish,jdbcType=INTEGER},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.home.model.Announcement">
+		update announcement
+		<set>
+			<if test="title != null">
+				title = #{title,jdbcType=VARCHAR},
+			</if>
+			<if test="text != null">
+				text = #{text,jdbcType=VARCHAR},
+			</if>
+			<if test="date != null">
+				date = #{date,jdbcType=TIMESTAMP},
+			</if>
+			<if test="type != null">
+				type = #{type,jdbcType=VARCHAR},
+			</if>
+			<if test="startTime != null">
+				start_time = #{startTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="endTime != null">
+				end_time = #{endTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createBy != null">
+				create_by = #{createBy,jdbcType=VARCHAR},
+			</if>
+			<if test="file!= null">
+				file = #{file,jdbcType=VARCHAR},
+			</if>
+			<if test="state != null">
+				state = #{state,jdbcType=BIT},
+			</if>
+			<if test="range != null">
+				`range` = #{range,jdbcType=VARCHAR},
+			</if>
+			<if test="invitation != null">
+				invitation = #{invitation,jdbcType=VARCHAR},
+			</if>
+			<if test="remove != null">
+				remove = #{remove,jdbcType=INTEGER},
+			</if>
+			<if test="sid != null">
+				sid = #{sid,jdbcType=INTEGER},
+			</if>
+			<if test="uid != null">
+				uid = #{uid,jdbcType=INTEGER},
+			</if>
+			<if test="accomplish != null">
+			accomplish=#{accomplish,jdbcType=INTEGER},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.home.model.Announcement">
+		update announcement
+
+		set title = #{title,jdbcType=VARCHAR},
+		text = #{text,jdbcType=VARCHAR},
+		date = #{date,jdbcType=TIMESTAMP},
+		type = #{type,jdbcType=VARCHAR},
+		start_time = #{startTime,jdbcType=TIMESTAMP},
+		end_time = #{endTime,jdbcType=TIMESTAMP},
+		create_by = #{createBy,jdbcType=VARCHAR},
+		file = #{file,jdbcType=VARCHAR},
+		state = #{state,jdbcType=BIT},
+		`range` = #{range,jdbcType=VARCHAR},
+		invitation = #{invitation,jdbcType=VARCHAR}
+		remove = #{remove,jdbcType=INTEGER}
+		sid = #{sid,jdbcType=INTEGER}
+		uid = #{uid,jdbcType=INTEGER}
+		accomplish = #{accomplish,jdbcType=INTEGER}
+
+
+
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	<insert id="save" parameterType="com.home.model.Announcement">
+		insert into announcement (title, text,
+		date,type,start_time,end_time,create_by,file,state,`range`,invitation,remove,sid,uid,accomplish)
+		values ( #{title,jdbcType=NVARCHAR}, #{text,jdbcType=NVARCHAR},
+
+		#{date,jdbcType=TIMESTAMP},#{type,jdbcType=VARCHAR},
+		#{startTime,jdbcType=TIMESTAMP},#{endTime,jdbcType=TIMESTAMP},
+		#{createBy,jdbcType=VARCHAR},#{file,jdbcType=VARCHAR},
+		#{state,jdbcType=BIT},#{state,jdbcType=BIT},
+		#{range,jdbcType=VARCHAR},#{invitation,jdbcType=VARCHAR}
+		,#{remove,jdbcType=INTEGER}
+		,#{sid,jdbcType=INTEGER}
+		,#{uid,jdbcType=INTEGER},#{accomplish,jdbcType=INTEGER})
+
+
+	</insert>
+	<select id="select" parameterType="com.home.model.Announcement"
+		resultMap="BaseResultMap">
+		select
+		annc.*
+
+		from announcement annc
+		<where>
+			<if test="remove!=null">
+				and annc.remove=#{remove}
+			</if>
+			<if test="accomplish!=null">
+				and annc.accomplish=#{accomplish}
+			</if>
+
+			<if test="id!=null">
+				and annc.id like CONCAT('%','${id}','%')
+			</if>
+			<if test="title!=null">
+				and annc.title like CONCAT('%','${title}','%')
+			</if>
+			<if test="type!=null">
+				and annc.type like CONCAT('%','${type}','%')
+			</if>
+			<if test="createBy!=null">
+				and annc.create_by like CONCAT('%','${createBy}','%')
+			</if>
+			<if test="date!=null">
+				and DATE_FORMAT(annc.date,'%Y-%m-%d')=DATE_FORMAT(#{date},'%Y-%m-%d')
+			</if>
+
+			<if test="iid!=null">
+				and (FIND_IN_SET(#{iid},annc.`range`)OR annc.`uid`=#{uid})
+			</if>
+
+		</where>
+		order by date DESC
+	</select>
+
+	<select id="select2" parameterType="java.lang.String" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from announcement
+		<where>
+			remove=0
+			<if test="id!= null">
+				and (FIND_IN_SET(#{id},announcement.`range`))
+			</if>
+		</where>
+		order by date DESC
+	</select>
+
+	<select id="select3" parameterType="java.lang.String" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from announcement
+		<where>
+
+			remove=0
+		</where>
+		order by date DESC
+	</select>
+	<select id="selectaccomplish" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+		select
+		annc.*
+		from announcement annc,announcement_state a_s
+		<where>
+			annc.id=a_s.aid
+			and FIND_IN_SET(#{uid},annc.`range`)
+			and annc.state=1
+			and annc.remove=0
+			and a_s.uid=#{uid,jdbcType=INTEGER}
+			and a_s.state=0
+		</where>
+		order by annc.date DESC , a_s.aid DESC
+	</select>
+	
+
+	<update id="deleteAnnc" parameterType="com.home.model.Announcement">
+		update announcement
+		<set>
+
+			<if test="state != null">
+				remove = #{state,jdbcType=INTEGER},
+			</if>
+			<if test="invitation != null">
+				invitation = #{invitation,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+</mapper>

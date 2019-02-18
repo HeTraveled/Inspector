@@ -1,0 +1,74 @@
+package com.plan.service.impl;
+
+import java.util.List;
+
+import com.github.pagehelper.PageHelper;
+import com.plan.mapper.MonthPlanNextMapper;
+import com.plan.model.MonthPlan;
+import com.plan.model.MonthPlanNext;
+import com.plan.model.WeeksPlanNext;
+import com.plan.service.MonthPlanNextService;
+import com.util.page.BeanUtil;
+import com.util.page.PagedResult;
+
+
+public class MonthPlanNextImpl implements MonthPlanNextService {
+
+	private MonthPlanNextMapper monthPlanNextMapper;
+
+	public MonthPlanNextMapper getMonthPlanNextMapper() {
+		return monthPlanNextMapper;
+	}
+
+	public void setMonthPlanNextMapper(MonthPlanNextMapper monthPlanNextMapper) {
+		this.monthPlanNextMapper = monthPlanNextMapper;
+	}
+
+	@Override
+	public Integer creatMonthPlanNext(List<MonthPlanNext> monthPlanNext) {
+		
+		return monthPlanNextMapper.creatMonthPlanNext(monthPlanNext);
+	}
+	
+	@Override
+	public PagedResult<MonthPlanNext> selectall(Integer month, Integer pageNo,
+			Integer pageSize) {
+		pageNo = pageNo == null?1:pageNo;  
+	    pageSize = pageSize == null?10:pageSize;  
+    PageHelper.startPage(pageNo,pageSize);
+    return BeanUtil.toPagedResult(monthPlanNextMapper.selectall(month));
+	}
+
+	@Override
+	public List<MonthPlanNext> selectthismonthsplan(int mid) {
+		
+		return monthPlanNextMapper.selectthismonthsplan(mid);
+	}
+
+	@Override
+	public Integer updatestate(int id) {
+		MonthPlanNext monthPlanNext=new MonthPlanNext();
+		monthPlanNext.setId(id);
+		monthPlanNext.setState(3);
+		return monthPlanNextMapper.updateByPrimaryKeySelective(monthPlanNext);
+	}
+	
+	@Override
+	public List<MonthPlanNext> monthplannextoverdue() {
+		
+		return monthPlanNextMapper.monthplannextoverdue();
+	}
+
+	@Override
+	public Integer updateOverdue(List<Integer> id) {
+	
+		return monthPlanNextMapper.updateOverdue(id);
+	}
+
+	@Override
+	public int monthplandelect(int id) {
+		// 
+		return monthPlanNextMapper.deleteByPrimaryKey(id);
+	}
+
+}

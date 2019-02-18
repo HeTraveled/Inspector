@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.schedule.mapper.ScheduleMapper" >
+  <resultMap id="BaseResultMap" type="com.schedule.model.Schedule" >
+    <id column="sid" property="sid" jdbcType="INTEGER" />
+    <result column="source" property="source" jdbcType="INTEGER" />
+    <result column="body" property="body" jdbcType="VARCHAR" />
+    <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="uid" property="uid" jdbcType="INTEGER" />
+     <result column="aid" property="aid" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    sid, source, body, start_time, end_time,uid,aid
+  </sql>
+  <select id="selectday" resultMap="BaseResultMap" >
+  	select 
+  	  <include refid="Base_Column_List" />
+  	 from `schedule` where DATE_FORMAT(now(),'%Y-%m-%d') 
+	BETWEEN DATE_FORMAT(start_time,'%Y-%m-%d') and DATE_FORMAT(end_time,'%Y-%m-%d')
+  </select>
+    <select id="selectMonth" resultMap="BaseResultMap"  parameterType="java.lang.Integer">
+  	  select 
+      	  <include refid="Base_Column_List" />
+    from schedule
+    where uid=#{uid}
+    and (
+      DATE_FORMAT( start_time, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' )
+    or DATE_FORMAT( end_time, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' )
+     )
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from schedule
+    where sid = #{sid,jdbcType=INTEGER}
+  </select>
+  <select id="selectaid" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from schedule
+    where aid = #{aid,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from schedule
+    where sid = #{sid,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteall" parameterType="java.util.List">
+		delete from schedule where aid in
+		<foreach collection="list" item="item" index="index" open="("
+			separator="," close=")">
+			#{item.aid}
+		</foreach>
+	</delete>
+	<insert id="creatschedule" parameterType="java.util.List" >
+    insert into schedule (sid, uid, source, body,
+      start_time, end_time, aid
+      )values 
+    <foreach collection="list" item="item" index="index"
+			separator=",">
+    (null, 
+    	#{item.uid,jdbcType=INTEGER}, 
+    	#{item.source,jdbcType=INTEGER}, 
+    	#{item.body,jdbcType=VARCHAR}, 
+     	#{item.startTime,jdbcType=TIMESTAMP}, 
+        #{item.endTime,jdbcType=TIMESTAMP}, 
+        #{item.aid,jdbcType=INTEGER}
+      )
+      </foreach>
+  </insert>
+  <insert id="insert" parameterType="com.schedule.model.Schedule" >
+    insert into schedule (sid, source, body, 
+      start_time, end_time,aid,uid)
+    values (#{sid,jdbcType=INTEGER}, #{source,jdbcType=INTEGER}, #{body,jdbcType=VARCHAR}, 
+      #{startTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP},#{aid,jdbcType=INTEGER},#{uid,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.schedule.model.Schedule" >
+  <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="sid">
+          SELECT LAST_INSERT_ID()
+      </selectKey>
+    insert into schedule
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="sid != null" >
+        sid,
+      </if>
+      <if test="source != null" >
+        source,
+      </if>
+      <if test="body != null" >
+        body,
+      </if>
+      <if test="startTime != null" >
+        start_time,
+      </if>
+      <if test="endTime != null" >
+        end_time,
+      </if>
+      <if test="aid != null" >
+        aid,
+      </if>
+            <if test="uid != null" >
+        uid,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="sid != null" >
+        #{sid,jdbcType=INTEGER},
+      </if>
+      <if test="source != null" >
+        #{source,jdbcType=INTEGER},
+      </if>
+      <if test="body != null" >
+        #{body,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null" >
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="aid != null" >
+        #{aid,jdbcType=INTEGER},
+      </if>
+            <if test="uid != null" >
+        #{uid,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.schedule.model.Schedule" >
+    update schedule
+    <set >
+      <if test="source != null" >
+        source = #{source,jdbcType=INTEGER},
+      </if>
+      <if test="body != null" >
+        body = #{body,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null" >
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+       <if test="aid != null" >
+        aid = #{aid,jdbcType=INTEGER},
+      </if>
+             <if test="uid != null" >
+        uid = #{uid,jdbcType=INTEGER},
+      </if>
+    </set>
+    where sid = #{sid,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.schedule.model.Schedule" >
+    update schedule
+    set source = #{source,jdbcType=INTEGER},
+      body = #{body,jdbcType=VARCHAR},
+      start_time = #{startTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      aid = #{aid,jdbcType=INTEGER},
+       uid = #{uid,jdbcType=INTEGER}
+    where sid = #{sid,jdbcType=INTEGER}
+  </update>
+</mapper>

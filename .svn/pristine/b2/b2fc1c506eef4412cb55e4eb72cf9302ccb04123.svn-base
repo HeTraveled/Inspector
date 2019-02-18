@@ -1,0 +1,260 @@
+package com.dept.controller;
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.dept.model.Dept;
+import com.dept.model.Emergency;
+import com.dept.model.EmergencyRecord;
+import com.dept.service.DeptService;
+import com.dept.service.EmergencyRecordSerivce;
+import com.dept.service.EmergencyService;
+import com.home.model.User;
+import com.inspector.model.Inspector;
+import com.inspector.service.InspectorService;
+import com.plan.service.WeeksPlanNextService;
+import com.plan.service.WeeksPlanService;
+import com.util.Log;
+import com.util.json.Json;
+import com.util.page.DataGrid;
+import com.util.page.PagedResult;
+@Controller
+@Scope("prototype")
+@RequestMapping("board")
+public class BoardController {
+
+	@Autowired
+	private InspectorService inspectorService;
+	@Autowired
+	private DeptService deptService;
+	@Autowired
+	private EmergencyService emergencyService;
+	@Autowired
+	private WeeksPlanNextService weeksPlanNextService;
+	@Autowired
+	private EmergencyRecordSerivce emergencyRecordSerivce;
+	
+	@RequestMapping("boardPage")
+	@ResponseBody
+	public ModelAndView boardPage(@RequestParam("state") Integer state,
+			@RequestParam(value="depts",required=false) Integer depts,HttpServletRequest request) {
+		ModelAndView mv = new ModelAndView();
+		User user=(User)request.getSession().getAttribute("user");
+		boolean pri=false;
+		boolean muchdept=false;
+		Integer did=user.getDid();
+		if(depts!=null)did=depts;
+		Integer principal=deptService.selectByPrimaryKey(user.getDid()).getPrincipal();
+		if(principal!=null&&user.getUid()==principal){
+			pri=true;
+			//一人负责多部门
+			if(deptService.countPri(user.getUid())>1){
+				List<Dept> muchdepts=deptService.principal(user.getUid());
+				mv.addObject("muchdepts", muchdepts);
+				muchdept=true;
+			}
+		}
+		List<Object> one=new ArrayList<Object>();
+		List<Object> two=new ArrayList<Object>();
+		List<Object> three=new ArrayList<Object>();
+		List<Object> four=new ArrayList<Object>();
+		if(state==1){
+			//督查事项
+			one=inspectorService.insEmergencyTop5(did,1);
+			two=inspectorService.insEmergencyTop5(did,2);
+			three=inspectorService.insEmergencyTop5(did,3);
+			four=inspectorService.insEmergencyTop5(did,4);
+		}else if(state==2){
+			//周计划
+			one=weeksPlanNextService.weeksEmergencyTop5(did,1);
+			two=weeksPlanNextService.weeksEmergencyTop5(did,2);
+			three=weeksPlanNextService.weeksEmergencyTop5(did,3);
+			four=weeksPlanNextService.weeksEmergencyTop5(did,4);
+		}else if(state==3){
+			//其他
+			one=emergencyRecordSerivce.top5(did,1);
+			two=emergencyRecordSerivce.top5(did,2);
+			three=emergencyRecordSerivce.top5(did,3);
+			four=emergencyRecordSerivce.top5(did,4);
+		}
+		mv.addObject("one",one);
+		mv.addObject("oneLength",one.size());
+		mv.addObject("two", two);
+		mv.addObject("twoLength",two.size());
+		mv.addObject("three", three);
+		mv.addObject("threeLength",three.size());
+		mv.addObject("four",four );
+		mv.addObject("fourLength", four.size());
+		mv.addObject("state", state);
+		mv.addObject("principal", pri);
+		mv.addObject("muchdept", muchdept);
+		mv.addObject("depts", depts);
+		mv.setViewName("board/board");
+		return mv;
+	}
+	/*
+	 * 添加页
+	 */
+	@RequestMapping(value="createBoardPage")
+	public ModelAndView createBoardPage(HttpServletRequest request){
+		ModelAndView mv=new ModelAndView();
+		User user=(User)request.getSession().getAttribute("user");
+		boolean muchdept=false;
+		//一人负责多部门
+		if(deptService.countPri(user.getUid())>1){
+			List<Dept> muchdepts=deptService.principal(user.getUid());
+			mv.addObject("muchdepts", muchdepts);
+			muchdept=true;
+		}
+		mv.addObject("muchdept", muchdept);
+		mv.setViewName("board/create");
+		return mv;
+	}
+	/**
+	 * 添加
+	 */
+	@RequestMapping("createBoard")
+	@ResponseBody
+	public Json createBoard(@RequestBody EmergencyRecord emergencyRecord,HttpServletRequest request){
+		try {
+			User user=(User)request.getSession().getAttribute("user");
+			emergencyRecord.setState(1);
+			Integer id=emergencyRecordSerivce.create(emergencyRecord);
+			if(id!=null){
+				Integer did=user.getDid();
+				if(emergencyRecord.getDid()!=null)did=emergencyRecord.getDid();
+				if(emergencyService.create(new Emergency(did,emergencyRecord.getEmergency(),3,id))==1){
+				return new Json(200,"操作成功！",null);
+				}else return new Json(201,"操作失败！",null);
+			}
+			else return new Json(201,"操作失败！",null);
+		} catch (Exception e) {
+			  Log.getLogger().error(e.getMessage(),e);  
+		         return new Json(500,null,null);
+		}
+	}
+	/*
+	 * 修改页
+	 */
+	@RequestMapping(value="updateBoardPage")
+	public ModelAndView updateBoardPage(@RequestParam("id") Integer id,HttpServletRequest request){
+		ModelAndView mv=new ModelAndView();
+		mv.addObject("emergencyRecord", emergencyRecordSerivce.selectid(id));
+		mv.setViewName("board/update");
+		return mv;
+	}
+	/**
+	 * 修改
+	 */
+	@RequestMapping("updateBoard")
+	@ResponseBody
+	public Json updateBoard(@RequestBody EmergencyRecord emergencyRecord,HttpServletRequest request){
+		try {
+			if(emergencyRecordSerivce.update(emergencyRecord)==1){
+				return new Json(200,"操作成功！",null);
+				}else return new Json(201,"操作失败！",null);
+		} catch (Exception e) {
+			  Log.getLogger().error(e.getMessage(),e);  
+		         return new Json(500,null,null);
+		}
+	}
+	/*
+	 * 更多列表
+	 */
+	
+	@RequestMapping("boardsList")
+	@ResponseBody
+	public DataGrid boardsList(@RequestParam(value="depts",required=false) Integer depts,
+			@RequestParam("state") Integer state,@RequestParam("flag") Integer flag,@RequestParam(value="page",required=false) Integer page,
+			@RequestParam(value="rows",required=false) Integer rows,HttpServletRequest request){
+		try {
+			DataGrid datagrid=new DataGrid();
+			User user=(User) request.getSession().getAttribute("user");
+			PagedResult<Object> pagedResult=null;
+			Integer did=user.getDid();
+			if(depts!=null)did=depts;
+			if(state==1)pagedResult=inspectorService.insEmergency(did, flag,page,rows);
+			else if(state==2)pagedResult=weeksPlanNextService.weeksEmergency(did,flag,page,rows);
+			else if(state==3)pagedResult=emergencyRecordSerivce.display(did,flag,page,rows);
+				 datagrid.setTotal(pagedResult.getTotal());
+				 datagrid.setRows(pagedResult.getDataList());
+			 	return datagrid;
+		} catch (Exception e) {
+			Log.getLogger().error(e.getMessage(), e);
+			return null;
+		}
+	}
+	
+	/*
+	 * 更多入口
+	 */
+	@RequestMapping(value="boardsPage")
+	public ModelAndView boardsPage(@RequestParam(value="depts",required=false) Integer depts,
+			@RequestParam("state") Integer state,@RequestParam("flag") Integer flag,HttpServletRequest request){
+		ModelAndView mv=new ModelAndView();
+		User user=(User)request.getSession().getAttribute("user");
+		boolean pri=false;
+		Integer principal=deptService.selectByPrimaryKey(user.getDid()).getPrincipal();
+		if(principal!=null&&user.getUid()==principal)pri=true;
+		mv.addObject("principal", pri);
+		mv.addObject("flag", flag);
+		mv.addObject("state", state);
+		mv.addObject("depts", depts);
+		mv.setViewName("board/boards");
+		return mv;
+	}
+	/**
+	 * 修改
+	 */
+	@RequestMapping("update")
+	@ResponseBody
+	public Json update(@RequestParam("depts") Integer depts,
+			@RequestParam("state") Integer state,@RequestParam("id") Integer id,@RequestParam("flag") Integer flag,HttpServletRequest request){
+		try {
+			User user=(User)request.getSession().getAttribute("user");
+			Integer did=user.getDid();
+			if(depts!=null){
+				did=depts;
+			}
+			if(emergencyService.update(new Emergency(did, flag, state, id))==1)
+				return new Json(200,"操作成功！",null);
+			else return new Json(201,"操作失败！",null);
+		} catch (Exception e) {
+			  Log.getLogger().error(e.getMessage(),e);  
+		         return new Json(500,null,null);
+		}
+	}
+	/**
+	 * 删除
+	 */
+	@RequestMapping("delete")
+	@ResponseBody
+	public Json delete(@RequestParam("depts") Integer depts,
+			@RequestParam("id") Integer id,@RequestParam("state") Integer state,HttpServletRequest request){
+		try {
+			User user=(User)request.getSession().getAttribute("user");
+			Integer did=user.getDid();
+			if(depts!=null)did=depts;
+			if(emergencyService.delete(new Emergency(did, state, id))==1){
+				if(state==3)emergencyRecordSerivce.delete(id);
+				return new Json(200,"操作成功！",null);
+				}
+			else return new Json(201,"操作失败！",null);
+		} catch (Exception e) {
+			  Log.getLogger().error(e.getMessage(),e);  
+		         return new Json(500,null,null);
+		}
+	}
+}

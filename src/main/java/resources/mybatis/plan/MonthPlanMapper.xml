@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.plan.mapper.MonthPlanMapper" >
+  <resultMap id="BaseResultMap" type="com.plan.model.MonthPlan" >
+    <id column="mid" property="mid" jdbcType="INTEGER" />
+    <result column="uid" property="uid" jdbcType="INTEGER" />
+    <result column="conclusion" property="conclusion" jdbcType="VARCHAR" />
+    <result column="remarks" property="remarks" jdbcType="VARCHAR" />
+    <result column="score" property="score" jdbcType="DECIMAL" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="my_score" property="myScore" jdbcType="DECIMAL" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+    <result column="years" property="years" jdbcType="INTEGER" />
+    <result column="months" property="months" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    mid, uid, conclusion, remarks, score, create_time, my_score, state, years, months
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="com.plan.model.MonthPlan" resultMap="BaseResultMap" >
+   SELECT
+	m.*,u.name
+	FROM month_plan m,`user` u
+	WHERE
+	m.uid=u.uid
+    and mid = #{mid,jdbcType=INTEGER}
+    
+  </select>
+  <select id="selectmonth" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from month_plan
+    where months = #{months,jdbcType=INTEGER}
+    and years =#{years,jdbcType=INTEGER}
+    <if test="uid!=null">
+    and uid=#{uid,jdbcType=INTEGER}
+    </if>
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from month_plan
+    where mid = #{mid,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.plan.model.MonthPlan" >
+    insert into month_plan (mid, uid, conclusion, 
+      remarks, score, create_time, 
+      my_score, state, years, 
+      months)
+    values (#{mid,jdbcType=INTEGER}, #{uid,jdbcType=INTEGER}, #{conclusion,jdbcType=VARCHAR}, 
+      #{remarks,jdbcType=VARCHAR}, #{score,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{myScore,jdbcType=DECIMAL}, #{state,jdbcType=INTEGER}, #{years,jdbcType=INTEGER}, 
+      #{months,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.plan.model.MonthPlan" >
+  <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="mid">
+          SELECT LAST_INSERT_ID()
+      </selectKey>
+    insert into month_plan
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="mid != null" >
+        mid,
+      </if>
+      <if test="uid != null" >
+        uid,
+      </if>
+      <if test="conclusion != null" >
+        conclusion,
+      </if>
+      <if test="remarks != null" >
+        remarks,
+      </if>
+      <if test="score != null" >
+        score,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="myScore != null" >
+        my_score,
+      </if>
+      <if test="state != null" >
+        state,
+      </if>
+      <if test="years != null" >
+        years,
+      </if>
+      <if test="months != null" >
+        months,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="mid != null" >
+        #{mid,jdbcType=INTEGER},
+      </if>
+      <if test="uid != null" >
+        #{uid,jdbcType=INTEGER},
+      </if>
+      <if test="conclusion != null" >
+        #{conclusion,jdbcType=VARCHAR},
+      </if>
+      <if test="remarks != null" >
+        #{remarks,jdbcType=VARCHAR},
+      </if>
+      <if test="score != null" >
+        #{score,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="myScore != null" >
+        #{myScore,jdbcType=DECIMAL},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=INTEGER},
+      </if>
+      <if test="years != null" >
+        #{years,jdbcType=INTEGER},
+      </if>
+      <if test="months != null" >
+        #{months,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.plan.model.MonthPlan" >
+    update month_plan
+    <set>
+      <if test="uid != null" >
+        uid = #{uid,jdbcType=INTEGER},
+      </if>
+      <if test="conclusion != null" >
+        conclusion = #{conclusion,jdbcType=VARCHAR},
+      </if>
+      <if test="remarks != null" >
+        remarks = #{remarks,jdbcType=VARCHAR},
+      </if>
+      <if test="score != null" >
+        score = #{score,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="myScore != null" >
+        my_score = #{myScore,jdbcType=DECIMAL},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=INTEGER},
+      </if>
+      <if test="years != null" >
+        years = #{years,jdbcType=INTEGER},
+      </if>
+      <if test="months != null" >
+        months = #{months,jdbcType=INTEGER},
+      </if>
+    </set>
+    where mid = #{mid,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.plan.model.MonthPlan" >
+    update month_plan
+    set uid = #{uid,jdbcType=INTEGER},
+      conclusion = #{conclusion,jdbcType=VARCHAR},
+      remarks = #{remarks,jdbcType=VARCHAR},
+      score = #{score,jdbcType=DECIMAL},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      my_score = #{myScore,jdbcType=DECIMAL},
+      state = #{state,jdbcType=INTEGER},
+      years = #{years,jdbcType=INTEGER},
+      months = #{months,jdbcType=INTEGER}
+    where mid = #{mid,jdbcType=INTEGER}
+  </update>
+  <select id="deptmonthplan" parameterType="com.plan.model.MonthPlan" resultMap="BaseResultMap" >
+	 select 
+	  m.*,u.name
+		from month_plan m,`user` u
+	<where> 
+		m.uid=u.uid
+		and u.did =#{did,jdbcType=INTEGER}
+		and m.years=#{years,jdbcType=INTEGER}
+		and m.months=#{month,jdbcType=INTEGER}
+	</where>
+  </select>
+  <select id="monthplanaudit" parameterType="com.plan.model.MonthPlan" resultMap="BaseResultMap" >
+	 select 
+	 m.*,u.name,d.departmentname,u2.`name` as leadership
+		from month_plan m,`user` u,department d,`user` u2
+	<where> 
+			m.uid=u.uid
+			and u.did=d.id
+			and d.leadership=u2.uid
+		and m.state=0
+		and u.did =#{did,jdbcType=INTEGER}
+		and m.years=#{years,jdbcType=INTEGER}
+		and m.months=#{month,jdbcType=INTEGER}
+	</where>
+  </select>
+  <select id="monthplanauditleader" parameterType="com.plan.model.MonthPlan" resultMap="BaseResultMap" >
+	 select 
+	  m.*,u.name,d.departmentname,u2.`name` as leadership
+		from month_plan m,`user` u,department d,`user` u2
+	<where> 
+		m.uid=u.uid	
+		and u.did=d.id
+		and d.leadership=u2.uid
+		and m.state =1
+		
+		and m.years=#{years,jdbcType=INTEGER}
+		and m.months=#{month,jdbcType=INTEGER}
+	</where>
+  </select>
+  <select id="selectrole" parameterType="com.home.model.User" resultType="com.home.model.User" >
+  SELECT * FROM `user` 
+  <where> 
+  	did  like "%100001%"
+			and uid=#{uid,jdbcType=INTEGER}
+</where>
+  </select>
+  <select id="selectcommon" parameterType="com.plan.model.MonthPlan" resultMap="BaseResultMap" >
+		   select 
+		m.*
+		from month_plan m,`user` u
+		
+		<where>
+		 m.uid=u.uid
+		
+		and u.did={did,jdbcType=INTEGER}
+		and 
+</where>
+  </select>
+  <update id="updateplan" parameterType="com.plan.model.MonthPlan" >
+    update month_plan
+    <set>
+      <if test="uid != null" >
+        uid = #{uid,jdbcType=INTEGER},
+      </if>
+      <if test="conclusion != null" >
+        conclusion = #{conclusion,jdbcType=VARCHAR},
+      </if>
+      <if test="remarks != null" >
+        remarks = #{remarks,jdbcType=VARCHAR},
+      </if>
+      <if test="score != null" >
+        score = #{score,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="myScore != null" >
+        my_score = #{myScore,jdbcType=DECIMAL},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=INTEGER},
+      </if>
+      <if test="years != null" >
+        years = #{years,jdbcType=INTEGER},
+      </if>
+      <if test="months != null" >
+        months = #{months,jdbcType=INTEGER},
+      </if>
+    </set>
+    where mid = #{mid,jdbcType=INTEGER}
+  </update>
+</mapper>

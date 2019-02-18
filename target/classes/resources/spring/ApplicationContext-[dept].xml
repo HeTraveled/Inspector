@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+     xmlns="http://www.springframework.org/schema/beans"  
+     xsi:schemaLocation="http://www.springframework.org/schema/beans 
+     http://www.springframework.org/schema/beans/spring-beans-4.2.xsd">
+     
+	<bean id="deptService" class="com.dept.service.Impl.DeptImpl">
+		<property name="deptMapper" ref="deptMapper" />
+	</bean>
+		<bean id="emergencyService" class="com.dept.service.Impl.EmergencyImpl">
+		<property name="emergencyMapper" ref="emergencyMapper" />
+	</bean>
+			<bean id="emergencyRecordService" class="com.dept.service.Impl.EmergencyRecordImpl">
+		<property name="emergencyRecordMapper" ref="emergencyRecordMapper" />
+	</bean>
+</beans>

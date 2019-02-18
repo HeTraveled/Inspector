@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<beans xmlns="http://www.springframework.org/schema/beans"  
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+     xmlns:context="http://www.springframework.org/schema/context"  
+     xmlns:aop="http://www.springframework.org/schema/aop" 
+	 xmlns:tx="http://www.springframework.org/schema/tx"
+     xsi:schemaLocation="http://www.springframework.org/schema/beans 
+     http://www.springframework.org/schema/beans/spring-beans-4.2.xsd 
+     http://www.springframework.org/schema/context 
+     http://www.springframework.org/schema/context/spring-context-4.2.xsd
+     http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+	 http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd"> 
+	 
+	 <!-- 账号及角色权限管理 -->
+	<import resource="ApplicationContext-[home].xml"/>
+	 <!--  督查事项管理 -->
+	<import resource="ApplicationContext-[inspector].xml"/>
+	 <!-- 公文管理 -->
+	<import resource="ApplicationContext-[official].xml"/>
+	 <!-- 工作计划管理 -->
+	<import resource="ApplicationContext-[plan].xml"/>
+	 <!-- 日程管理 -->
+	<import resource="ApplicationContext-[schedule].xml"/>
+	 <!-- 系统管理 -->
+	<import resource="ApplicationContext-[sys].xml"/>
+	 <!-- 部门管理 -->
+	<import resource="ApplicationContext-[dept].xml"/>
+	
+	<!-- 导入属性配置文件 -->
+	<context:property-placeholder location="classpath:resources/jdbc.properties" />
+		<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${jdbc.driver}"/>
+		<property name="url" value="${jdbc.url}"/>
+		<property name="username" value="${jdbc.username}"/>
+		<property name="password" value="${jdbc.password}"/>
+	</bean>
+		<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="configLocation" value="classpath:resources/mybatis/config.xml"/>
+	</bean>
+	<!-- 扫描 basePackage下所有的接口，根据对应的mapper.xml为其生成代理类-->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.**.mapper"/>
+	</bean>
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">  
+    <property name="dataSource" ref="dataSource"></property>  
+</bean>  
+	<!-- 定义事务通知 -->  
+<tx:advice id="txAdvice" transaction-manager="transactionManager">  
+    <!-- 定义方法的过滤规则 -->  
+    <tx:attributes>  
+			     <!-- 所有方法都使用事务 -->  
+        <tx:method name="*" propagation="REQUIRED"/>  
+     <!-- 定义所有get开头的方法都是只读的 -->  
+        <tx:method name="get*" read-only="true"/>  
+    </tx:attributes>  
+</tx:advice>  
+	<!-- 定义AOP配置 -->  
+<aop:config>  
+    <!-- 定义一个切入点 -->  
+    <aop:pointcut expression="execution(* com..*..service..*(..))" id="pc"/>  
+    <!-- 对切入点和事务的通知，进行适配 -->  
+    <aop:advisor advice-ref="txAdvice" pointcut-ref="pc"/>  
+</aop:config>
+</beans>

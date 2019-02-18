@@ -1,0 +1,234 @@
+package com.plan.controller;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.ibatis.annotations.Param;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.dept.service.DeptService;
+import com.home.model.User;
+
+import com.plan.model.YearPlan;
+import com.plan.model.YearPlanNext;
+import com.plan.service.YearPlanNextService;
+import com.plan.service.YearPlanService;
+import com.util.Log;
+import com.util.json.Json;
+import com.util.page.DataGrid;
+import com.util.page.PagedResult;
+
+import springfox.documentation.annotations.ApiIgnore;
+
+@Controller
+@Scope("prototype")
+@ApiIgnore
+@RequestMapping("year")
+public class YearPlanController {
+	
+	@Autowired
+	private YearPlanService yearPlanService;
+	@Autowired
+	private YearPlanNextService yearPlanNextService;
+	@Autowired
+	private DeptService deptService;
+
+	//年计划列表跳转
+	@RequestMapping("yearplanskip")
+	public ModelAndView yearplanskip(HttpServletRequest request){
+		ModelAndView mv=new ModelAndView();
+		Calendar cal = Calendar.getInstance();
+		Integer year = cal.get(Calendar.YEAR);
+		User user=(User)request.getSession().getAttribute("user");
+		if(yearPlanService.selectall(year)==null){
+		mv.addObject("plan",1);
+		}
+		mv.addObject("role",user.getRid());
+		mv.setViewName("plan/yearplanlist");
+		return mv;
+	}
+	
+	//年计划详情页更新跳转
+		@RequestMapping("yearplannextskip")
+		public ModelAndView yearplannextskip(@Param("yid")int yid,HttpServletRequest request){
+			ModelAndView mv=new ModelAndView();
+			User user=(User) request.getSession().getAttribute("user");
+			List<YearPlanNext> yearPlanNext=new ArrayList<YearPlanNext>();
+			if(user.getRid()==1){
+				List<YearPlanNext> group=yearPlanNextService.selectgroup(yid);
+				for(int i=0;i<group.size();i++){
+					YearPlanNext replace=new YearPlanNext();
+					yearPlanNext=yearPlanNextService.selectbykey(yid,group.get(i).getState());
+					if(yearPlanNext!=null){
+					replace.setState(group.get(i).getState());
+					replace.setDepartmentname(yearPlanNext.get(0).getDepartmentname());
+					}
+					group.set(i, replace);
+					group.get(i).setYearlist(yearPlanNext);
+				}
+				mv.addObject("thisyear",group );
+			}else{
+				List<YearPlanNext> group=new ArrayList<YearPlanNext>();
+				YearPlanNext replace=new YearPlanNext();
+				yearPlanNext=yearPlanNextService.selectbydept(user.getDid(),yid);
+				replace.setDepartmentname(yearPlanNext.get(0).getDepartmentname());
+				replace.setState(user.getDid());
+				group.set(0,replace);
+				group.get(0).setYearlist(yearPlanNext);
+				mv.addObject("thisyear",group );
+			}
+			mv.addObject("dept",deptService.selectall());
+			mv.setViewName("plan/yearplanupdate");
+			return mv;
+		}
+		
+		//年计划详情页面
+	@RequestMapping("yearplanparticulars")
+	public ModelAndView yearplanparticulars(@Param("yid")int yid,HttpServletRequest request){
+		ModelAndView mv=new ModelAndView();
+		User user=(User) request.getSession().getAttribute("user");
+		
+		mv.addObject("userid", user.getRid());
+		mv.addObject("year", yearPlanService.selectbykey(yid));
+		List<YearPlanNext> yearPlanNext=new ArrayList<YearPlanNext>();
+		if(user.getRid()==1){
+			List<YearPlanNext> group=yearPlanNextService.selectgroup(yid);
+			for(int i=0;i<group.size();i++){
+				YearPlanNext replace=new YearPlanNext();
+				yearPlanNext=yearPlanNextService.selectbykey(yid,group.get(i).getState());
+				if(yearPlanNext!=null){
+				replace.setState(group.get(i).getState());
+				replace.setDepartmentname(yearPlanNext.get(0).getDepartmentname());
+				}
+				group.set(i, replace);
+				group.get(i).setYearlist(yearPlanNext);
+			}
+			mv.addObject("thisyear",group );
+		}else{
+			List<YearPlanNext> group=new ArrayList<YearPlanNext>();
+			YearPlanNext replace=new YearPlanNext();
+			yearPlanNext=yearPlanNextService.selectbydept(user.getDid(),yid);
+			replace.setDepartmentname(yearPlanNext.get(0).getDepartmentname());
+			replace.setState(user.getDid());
+			group.add(replace);
+			group.get(0).setYearlist(yearPlanNext);
+			mv.addObject("thisyear",group );
+		}
+		
+		mv.setViewName("plan/yearplanparticulars");
+		return mv;
+	}
+	//新建年计划
+	@RequestMapping("creatyearplanPage")
+	public ModelAndView creatyearplanPage(HttpServletRequest request){
+		ModelAndView mv=new ModelAndView();
+		Calendar cal = Calendar.getInstance();
+		Integer years = cal.get(Calendar.YEAR);
+		mv.addObject("dept",deptService.selectall());
+		YearPlan yearPlan=yearPlanService.selectall(years);
+		mv.addObject("lastyear",yearPlan);
+		if(yearPlan!= null){
+			
+			mv.addObject("lastmonthnext",yearPlanNextService.selectall(yearPlan.getYid()));
+		}
+		mv.setViewName("plan/yearplan");
+		return mv;
+	}
+	
+	//部门年计划列表
+	@RequestMapping("yearplanlist")
+	@ResponseBody
+	public DataGrid yearplanlist(HttpServletRequest request){
+		DataGrid datagrid=new DataGrid();
+		Calendar cal = Calendar.getInstance();
+		Integer years = cal.get(Calendar.YEAR);
+		String page=request.getParameter("page");
+		String rows=request.getParameter("rows");	
+		
+		PagedResult<YearPlan> pagedResult=yearPlanService.selectlist(years,Integer.parseInt(page),Integer.parseInt(rows));
+		 if(pagedResult.getDataList()!=null&&pagedResult.getDataList().size()!=0){
+			 datagrid.setTotal(pagedResult.getTotal());
+			 datagrid.setRows(pagedResult.getDataList());
+		 }
+		 return datagrid;
+	}
+	//新建年计划
+	@RequestMapping(value="creatyearplan",method=RequestMethod.POST)
+	@ResponseBody
+	public Json creatyearplan(@RequestBody YearPlan yearplan,HttpServletRequest request){
+	try{
+	User user=(User)request.getSession().getAttribute("user");
+	yearplan.setUid(user.getUid());
+	yearplan.setCreateTime(new Date());
+	Integer a=yearPlanService.creatyearplan(yearplan);
+	if(a!=null){
+		for(int i=0;i<yearplan.getYearPlanNext().size();i++){
+			yearplan.getYearPlanNext().get(i).setYid(a);
+		
+		}
+		if(yearPlanNextService.creatyearplannext(yearplan.getYearPlanNext())!=null)
+			return new Json(200,"添加成功",null);
+	}
+	return new Json(201,"添加失败",null);
+	}catch(Exception e){
+		 Log.getLogger().error(e.getMessage(),e);  
+	      return new Json(500,null,null);
+	}
+	}
+	
+	//更改状态
+	@RequestMapping(value="yearplanupdate",method=RequestMethod.POST)
+	@ResponseBody
+	public Json yearplanupdate(@Param("id")int id,HttpServletRequest request){
+		try{
+		
+			if(yearPlanNextService.yearplanupdate(id)!=null){
+				return new Json(200,"更改成功",null);
+			}
+			return new Json(201,"添加失败",null);
+		}catch(Exception e){
+			 Log.getLogger().error(e.getMessage(),e);  
+		      return new Json(500,null,null);
+		}
+	}
+	
+	//删除条目
+		@RequestMapping(value="yearplandelect",method=RequestMethod.POST)
+		@ResponseBody
+		public Json yearplandelect(@Param("id")int id,HttpServletRequest request){
+			try{
+				if(yearPlanNextService.yearplandelect(id)!=null){
+					return new Json(200,"更改成功",null);
+				}
+				return new Json(201,"添加失败",null);
+			}catch(Exception e){
+				 Log.getLogger().error(e.getMessage(),e);  
+			      return new Json(500,null,null);
+			}
+		}
+		//添加年计划
+				@RequestMapping(value="updateyearplan",method=RequestMethod.POST)
+				@ResponseBody
+				public Json updateyearplan(@RequestBody List<YearPlanNext> yearPlannext ,HttpServletRequest request){
+					try{
+						if(yearPlanNextService.creatyearplannext(yearPlannext)!=null){
+							return new Json(200,"更改成功",null);
+						}
+						return new Json(201,"添加失败",null);
+					}catch(Exception e){
+						 Log.getLogger().error(e.getMessage(),e);  
+					      return new Json(500,null,null);
+					}
+				}
+}

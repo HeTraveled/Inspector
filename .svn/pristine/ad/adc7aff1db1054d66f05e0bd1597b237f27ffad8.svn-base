@@ -1,0 +1,31 @@
+package com.home.service;
+
+
+import java.util.List;
+
+import com.home.model.Announcement;
+import com.util.page.PagedResult;
+
+public interface AnnouncementServer {
+	
+	Integer save(Announcement announcement);
+
+	PagedResult<Announcement> select(Announcement announcement,Integer pageNo,Integer rows);
+	//主页查询方法
+	List<Announcement> select2(Integer id);
+	//督察员查询方法
+	List<Announcement> select3();
+	
+	int deleteByPrimaryKey(int id);
+	
+	Announcement selectByPrimaryKey(Integer id);
+	
+	int deleteAnnc(int id,int state,String invitation);
+	
+	int updateAnnc(Announcement announcement);
+	
+	PagedResult<Announcement> selectaccomplish(Integer uid,Integer pageNo,Integer rows);
+	
+	
+	
+}

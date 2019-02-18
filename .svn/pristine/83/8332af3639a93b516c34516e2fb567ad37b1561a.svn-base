@@ -1,0 +1,497 @@
+<%@ page contentType="text/html;charset=utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%
+	String path = request.getContextPath();
+	String basePath = request.getScheme() + "://"
+			+ request.getServerName() + ":" + request.getServerPort()
+			+ path + "/";
+%>
+
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css"
+	href="<%=basePath%>jsAndcss/ymnets.easyui/themes/base/easyui.css">
+<link href="<%=basePath%>jsAndcss/ymnets.easyui/themes/skin-green.css"
+	rel="stylesheet" />
+
+<link rel="stylesheet" type="text/css"
+	href="<%=basePath%>jsAndcss/ymnets.easyui/content/Site.css">
+<script type="text/javascript"
+	src="<%=basePath%>jsAndcss/ymnets.easyui/jquery.min.js"></script>
+<script type="text/javascript"
+	src="<%=basePath%>jsAndcss/ymnets.easyui/jquery.easyui.min.js"></script>
+<script
+	src="<%=basePath%>jsAndcss/ymnets.easyui/content/js/jquery.easyui.plus.js"></script>
+<link
+	href="<%=basePath%>jsAndcss/ymnets.easyui/content/fontawesome/css/font-awesome.min.css"
+	rel="stylesheet" />
+			<script
+	src="<%=basePath%>jsAndcss/ymnets.easyui/content/js/datagrid-filter.js"></script>
+	<script
+	src="<%=basePath%>jsAndcss/ymnets.easyui/locale/easyui-lang-zh_CN.js"></script>
+	<script src="<%=basePath%>js/url.js"></script>
+			<style type="text/css">
+		.icon-filter{
+			background:url('<%=basePath%>images/filter.png') no-repeat left center;
+		}
+	</style>
+<body>
+<div style="padding:4px 5px 0px 5px;">
+<a style="display: none;" id="remind"></a>
+		<div class="mvctool">
+		<c:if test="${role!=1 }">
+				<select id="display" class="easyui-combobox" style="width:150px;height:25px;padding:10px;" editable="false">
+					<option value="1" <c:if test="${display==1}">selected</c:if>>全部</option>
+					<option value="2" <c:if test="${display==2}">selected</c:if>>责任单位</option>
+					<option value="3" <c:if test="${display==3}">selected</c:if>>协助单位</option>
+				</select>
+		</c:if>
+		<c:if test="${role==1 }">
+					<div class="datagrid-btn-separator"></div>
+			<a id="btnEdit" style="float: left;" class="l-btn l-btn-plain"	
+				onclick="update()"><span class="l-btn-left"><span
+					class="l-btn-text fa fa-pencil" style="font-size:14px"></span><span
+					style="font-size:12px">修改</span>
+			</span>
+			</a>
+			<div class="datagrid-btn-separator"></div>
+			<a id="btnDelete" style="float: left;" class="l-btn l-btn-plain"
+				onclick="flag(1)"><span class="l-btn-left"><span
+					class="l-btn-text fa fa-trash" style="font-size:14px"></span><span
+					style="font-size:12px">删除</span>
+			</span>
+			</a>
+			<div class="datagrid-btn-separator"></div>
+			<a id="btnDelete" style="float: left;" class="l-btn l-btn-plain"
+				onclick="flag(4)"><span class="l-btn-left"><span
+					class="l-btn-text fa fa-fighter-jet" style="font-size:14px"></span><span
+					style="font-size:12px">启动</span>
+			</span>
+			</a>
+			<div class="datagrid-btn-separator"></div>
+			<a id="btnDelete" style="float: left;" class="l-btn l-btn-plain"
+				onclick="flag(2)"><span class="l-btn-left"><span
+					class="l-btn-text fa fa-ban" style="font-size:14px"></span><span
+					style="font-size:12px">取消</span>
+			</span>
+			</a>
+						<div class="datagrid-btn-separator"></div>
+			<a id="btnDelete" style="float: left;" class="l-btn l-btn-plain"
+				onclick="flag(3)"><span class="l-btn-left"><span
+					class="l-btn-text fa fa-check" style="font-size:14px"></span><span
+					style="font-size:12px">完成</span>
+			</span>
+			</a>
+			</c:if>
+		<table id="List" style="height:auto;border:1px solid #ccc;">
+			<thead>
+				<tr>
+					<th data-options="field:'iid',width: 80,sortable:true,styler: function(value,row,index){return {style:'left:1px;position: relative;'};}" >编号ID</th>
+					<th align="center" data-options="field:'leadershipname',width: 200,styler: function(value,row,index){return {style:'left:2px;position: relative;'};}" >分管领导</th>
+					<th align="center" data-options="field:'responsibilityname',width: 200,styler: function(value,row,index){return {style:'left:3px;position: relative;'};}" >责任单位（主责人）</th>
+					<th align="center" data-options="field:'assistDept',width: 265,formatter:assistDept,styler: function(value,row,index){return {style:'left:4px;position: relative;'};}" >协助单位（协助人）</th>
+					<th data-options="field:'body',width: 330,sortable:true,styler: function(value,row,index){return {style:'left:5px;position: relative;'};}" >督查要求</th>
+					<th data-options="field:'endTime',width: 150,sortable:true,formatter:endTime,styler: function(value,row,index){return {style:'left:6px;position: relative;'};}" >完成时限</th>
+					<th data-options="field:'state',width:100,formatter:state,sortable:true,styler: function(value,row,index){return {style:'left:7px;position: relative;'};}">状态</th>
+					<th data-options="field:'source',width: 260,sortable:true,formatter:source,styler: function(value,row,index){return {style:'left:8px;position: relative;'};}" >事项来源</th>
+					<th data-options="field:'type',width: 100,sortable:true,formatter:type,styler: function(value,row,index){return {style:'left:9px;position: relative;'};}" >事项类型</th>
+					<th align="center" data-options="field:'nextDay',width: 100,formatter:nextDay,styler: function(value,row,index){return {style:'left:10px;position: relative;'};}" >距离下次反馈</th>
+					<th data-options="field:'requirements',width: 300,sortable:true,styler: function(value,row,index){return {style:'left:11px;position: relative;'};}" >任务描述</th>
+					<th data-options="field:'frequency',width: 100,sortable:true,formatter:frequency,styler: function(value,row,index){return {style:'left:12px;position: relative;'};}" >反馈频率</th>
+					<th align="center" data-options="field:'delayDay',width: 150,formatter:delayDay,sortable:true,styler: function(value,row,index){return {style:'left:13px;position: relative;'};}" >延期天数</th>
+					<th align="center" data-options="field:'applyCause',width:100,formatter:applyCause,sortable:true,styler: function(value,row,index){return {style:'left:14px;position: relative;'};}">延期状态</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+	</div>
+	<script type="text/javascript">
+		$(function() {
+					var dg =$('#List').datagrid();
+					var display="${display}";
+			dg.datagrid({
+				width : SetGridWidthSub(10),
+				height : SetGridHeightSub(45),
+				url : 'inspectorList',
+				pageSize : 20,
+				pageList : [ 10, 20, 30, 40, 50 ],
+				pagination : true,
+				pagePosition:'top',
+				loadMsg:'数据加载中...',
+				striped : true, //奇偶行是否区分
+				singleSelect : true,
+				multiSort:true,
+				sortName:'',
+				sortOrder:'',
+				remoteSort:true,
+				remoteFilter:true,
+				queryParams:{
+					display:display
+				}
+			});
+			dg.datagrid({
+			onDblClickCell: function(index,field,value){
+					var row = $(this).datagrid('getSelected');
+					 $("#modalwindowContent").html
+					 ("<iframe width='100%' height='100%' frameborder='0''  src='../inspector/inspectorDetails?iid="+row.iid+"'></iframe>");
+         $("#modalwindowContent").window({ title: row.source, width: 900, height: 880, iconCls: 'fa fa-file-text-o' }).window('open');
+				},
+				onLoadSuccess:function(data){
+					var state="${state}";
+					if(state!=''&&state!=null){
+					dg.datagrid('addFilterRule', {
+					field: 'state',
+					op: 'equal',
+					value: state
+				});
+					}
+				}
+		});
+					$(window).resize(function() {
+				$('#List').datagrid('resize', {
+
+				}).datagrid('resize', {
+					width : SetGridWidthSub(10),
+					height : SetGridHeightSub(45)
+				});
+			});
+								dg.datagrid({
+				rowStyler:function(index,row){
+				if(row.endTime!=undefined&&row.state!=3&&row.state!=5){
+				var todate = new Date(row.endTime.replace(/\-/g,"\/"));
+				var date=new Date();
+			if (todate>date){
+				return 'background-color: #C1FFC1;color:black;';
+			}else if(todate<date){
+				return 'background-color:#F08080;color:white;';
+			}
+		}
+		}
+		});
+						param(dg);
+						 var websocket=new WebSocket("ws://"+url+"websocket");
+						$("#remind").click(function(){
+							  var text = '4';
+					        if(text == null || text == "")return false;
+					        var msg = {
+					            msgContent: text,
+					            postsId: 1
+					        };
+					        if (websocket.readyState==1) {
+					        websocket.send(JSON.stringify(msg));
+					        }
+					        
+					        });
+					         var dis=1;
+					$('#display').combobox({
+					onSelect: function(record){
+					 if(dis==0){
+					 var state="${state}";
+						 location.href='data?state='+state+'&display='+record.value;
+					}
+						 dis=0;
+                  }
+                 });
+		});
+			function param(dg){
+			dg.datagrid('enableFilter', [{
+				field:'iid',
+				type:'text',
+				options:{precision:1},
+				op:['contains']
+			},{
+				field:'source',
+				type:'text',
+				options:{precision:1},
+				op:['contains']
+			},{
+				field:'body',
+				type:'text',
+				options:{precision:1},
+				op:['contains']
+			},{
+				field:'requirements',
+				type:'text',
+				options:{precision:1},
+				op:['contains']
+			},{
+				field:'endTime',
+				type:'datebox',
+				options:{precision:1},
+				op:['equal']
+			},{
+				field:'type',
+				type:'combobox',
+				options:{
+					panelHeight:'auto',
+					data:[{value:'',text:'全部'},{value:'1',text:'会议'},{value:'3',text:'专项督查'},{value:'4',text:'其他'}],
+					onChange:function(value){
+						if (value == ''){
+							dg.datagrid('removeFilterRule', 'type');
+						} else {
+							dg.datagrid('addFilterRule', {
+								field: 'type',
+								op: 'equal',
+								value: value
+							});
+						}
+						dg.datagrid('doFilter');
+					}
+					}
+					},{
+				field:'frequency',
+				type:'combobox',
+				options:{
+					panelHeight:'auto',
+					data:[{value:'',text:'全部'},{value:'1',text:'日'},{value:'2',text:'周'},{value:'3',text:'月'}],
+					onChange:function(value){
+						if (value == ''){
+							dg.datagrid('removeFilterRule', 'frequency');
+						} else {
+							dg.datagrid('addFilterRule', {
+								field: 'frequency',
+								op: 'equal',
+								value: value
+							});
+						}
+						dg.datagrid('doFilter');
+					}
+					}
+					},{
+				field:'applyCause',
+				type:'combobox',
+				options:{
+					panelHeight:'auto',
+					data:[{value:'',text:'全部'},{value:'1',text:'已通过'},{value:'2',text:'审核中'},
+					{value:'3',text:'已延期'},{value:'0',text:'不通过'}],
+					onChange:function(value){
+						if (value == ''){
+							dg.datagrid('removeFilterRule', 'applyCause');
+						} else {
+							dg.datagrid('addFilterRule', {
+								field: 'applyCause',
+								op: 'equal',
+								value: value
+							});
+						}
+						dg.datagrid('doFilter');
+					}
+					}
+					},{
+				field:'state',
+				type:'combobox',
+				options:{
+					panelHeight:'auto',
+					data:[{value:'',text:'全部'},{value:'1',text:'未启动'},{value:'2',text:'进行中'},
+					{value:'3',text:'已取消'},{value:'4',text:'已超期'},{value:'5',text:'已完成'}],
+					onChange:function(value){
+						if (value == ''){
+							dg.datagrid('removeFilterRule', 'state');
+						} else {
+							dg.datagrid('addFilterRule', {
+								field: 'state',
+								op: 'equal',
+								value: value
+							});
+						}
+						dg.datagrid('doFilter');
+					}
+					}
+					}]);
+		}
+			function frameReturnByClose() {
+        $("#modalwindowContent").window('close');
+    }
+     function frameReturnByMes(mes) {
+        $.messageBox5s('系统提示', mes);
+        //setTimeout("location.href='data'", 1000);
+    }
+		function update(){
+		var row = $('#List').datagrid('getSelected');
+		if(row.iid==''||row.iid==null)return false;
+		if(row.state==3||row.state==5)return false;
+		$("#modalwindowContent").html("<iframe width='100%' height='100%' frameborder='0''  src='../inspector/updateInspectorPage?iid="
+		+row.iid+"'></iframe>");
+        $("#modalwindowContent").window({ title: '修改——'+row.source, width: 900, height: 880, iconCls: 'fa fa-file-text-o' }).window('open');
+		}
+		var date=new Date();
+		function source(value, row, index){
+		var endTime = new Date(row.endTime.replace(/\-/g,"\/"));
+		var day=(endTime - date) / (1000 * 60 * 60 * 24);
+			if(day>=0&&day<7&&row.state!=5&&row.state!=3){
+				return "<font style='color:red;font-weight: bold;'>"+row.source+"</font>";
+			}else 
+			return row.source;
+		}
+				function endTime(value, row, index){
+		var endTime = new Date(row.endTime.replace(/\-/g,"\/"));
+		var day=(endTime - date) / (1000 * 60 * 60 * 24);
+			if(day>=0&&day<7&&row.state!=5&&row.state!=3){
+				return "<font style='color:red;font-weight: bold;'>"+row.endTime+"</font>";
+			}else 
+			return row.endTime;
+		}
+		   function type(value, row, index){
+			   if(row.type==1){
+			   return "会议";
+			   }else if(row.type==2){
+			   return "金宏网";
+	        	}
+	        	else if(row.type==3){
+			   return "专项督查";
+	        	}else if(row.type==4){
+			   return "其他";
+	        	}};
+	        	  function frequency(value, row, index){
+			   if(row.frequency==1){
+			   return "日";
+			   }else if(row.frequency==2){
+			   return "周";
+	        	}
+	        	else if(row.frequency==3){
+			   return "月";
+	        	}};
+			   function state(value, row, index){
+			   if(row.state==1){
+			   return "未启动";
+			   }else if(row.state==2){
+			   return "进行中";
+	        	}else if(row.state==3){
+			   return "已取消";
+	        	}else if(row.state==4){
+			   return "已超期";
+	        	}else if(row.state==5){
+			   return "已完成";
+	        	}};
+	        	function delayDay(value, row, index){
+	        	if(row.applyCause==3)return "<font style='color:red;font-weight: bold;'>"+row.delayDay+"天</font>";
+	        	 else return "<font style='color:red;font-weight: bold;'>/</font>";
+	        	}
+	        	function applyCause(value, row, index){
+	        	  if(row.applyCause==3){
+			   return '<span class="l-btn-text fa fa-check" style="font-size:14px;color:#71C671;"></span>';
+			   } else if(row.applyCause==2||row.applyCause==1){
+			   	return '<span class="l-btn-text fa fa-clock-o" style="font-size:14px;color:#FF7256;"></span>';
+			   }
+			   else{
+			   return '<span class="l-btn-text fa fa-close" style="font-size:14px;color:#ff0000;"></span>';
+	        	}
+	        	}
+	        		   function assistDept(value, row, index){
+			   if(row.assistDept!=null&&row.assistDept!=''){
+			    return row.assistDept;
+			   }else{
+			   return "<font style='color:black;font-weight: bold;'>/</font>";
+	        	}};
+	        	  function nextDay(value, row, index){
+	        	  if(row.state==2||row.state==4){
+	        	  if(row.nextDay==null)return "<font style='font-weight: bold;'>/</font>";
+	        	   else if(row.nextDay==-1)return "<font style='font-weight: bold;'>每天</font>";
+	        	 else if(row.nextDay==0)return "<font style='font-weight: bold;'>今天</font>";
+			  	else return "<font style='font-weight: bold;'>"+row.nextDay+"天</font>";
+			  	}else return "<font style='font-weight: bold;'>/</font>";
+	        	};
+	        		function flag(flag) {
+			var row = $('#List').datagrid('getSelected');
+			if(row.iid==''||row.iid==null)return false;
+			var url="";
+			var str="";
+			var state=0;
+			if(flag==1){
+				url="delInspector";
+				str="删除";
+			}
+				if(flag==2){
+						if(row.state==1||row.state==3||row.state==5){
+					$.messager.alert('系统提示','不可取消！','warning');
+						return false;
+					}else{
+				url="offInspector";
+				str="取消";
+				state=3;
+				}
+			}
+				if(flag==3){
+				if(row.state==1||row.state==3||row.state==5){
+					$.messager.alert('系统提示','不可完成！','warning');
+						return false;
+					}else{
+				url="completeInspector";
+				str="完成";
+				state=5;
+				}
+			}
+			if(flag==4){
+						if(row.state!=1){
+					$.messager.alert('系统提示','已经开启！','warning');
+						return false;
+					}else{
+				url="startInspector";
+				str="启动";
+				state=2;
+				}
+			}
+			$.messager.confirm('系统提示', '确定要'+str+'该事项吗？', function(r) {
+				if (r) {
+							$.ajax({
+						type : "GET",
+						url : url,
+						data : "iid="+row.iid+"&state="+state,
+						success : function(data) {
+						        if (data.code > 0) {
+                          			$.messager.show({
+									title:'系统提示',
+									msg:data.message,
+									timeout:5000,
+									showType:'slide'
+								});
+									if(data.code==200){
+									 if(state==2)messages(data.data,5);
+									else if(state==3)messages(data.data,6);
+									else if(state==5)messages(data.data,7);
+									else setTimeout("location.href='data'", 1000);
+						}
+                          }
+						},
+						   error: function (request) {
+                          $.messager.alert('系统提示','请求出错！','error');
+                      }
+					});
+				}
+			});
+		}
+				function wxmes(mid){
+		if(mid!=null){
+			 $.ajax({
+                      type: "GET",
+                      url: "http://gt.qdgxtz.com/inspectors-prod/WebSocketController/WebSocket/send",
+                      data:"state=4&mid="+mid,
+                      success: function (data) {
+                      	setTimeout("location.href='data'", 1000);
+                      },
+                      error: function (request) {
+                          $.messager.alert('系统提示','请求出错！','error');
+                      }
+                  });
+                  }
+		}
+		function messages(iid,flag){
+						 $.ajax({
+                      type: "GET",
+                      url: "InspectorMes",
+                      data:"iid="+iid+"&flag="+flag,
+                      success: function (data) {
+						$("#remind").trigger("click");
+						wxmes(data.data);
+                      },
+                      error: function (request) {
+                          $.messager.alert('系统提示','请求出错！','error');
+                      }
+                  });
+		}
+	</script>
+		<div id="modalwindowContent" class="easyui-window"
+			data-options="modal:true,closed:true,minimizable:false,shadow:false,maximized:true"></div>
+</body>
+</html>

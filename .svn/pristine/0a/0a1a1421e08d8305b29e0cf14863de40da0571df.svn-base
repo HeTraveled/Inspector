@@ -1,0 +1,488 @@
+package com.plan.controller;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+
+import com.dept.model.Dept;
+import com.dept.service.DeptService;
+import com.home.model.User;
+import com.home.service.UserService;
+import com.plan.model.WeeksPlan;
+import com.plan.model.WeeksPlanMessage;
+import com.plan.model.WeeksPlanNext;
+
+
+
+
+import com.plan.service.WeeksPlanMessageSerivce;
+import com.plan.service.WeeksPlanNextService;
+import com.plan.service.WeeksPlanService;
+
+import com.sun.org.apache.xerces.internal.impl.xpath.regex.ParseException;
+import com.sys.model.MessageRemind;
+import com.sys.model.Messages;
+import com.sys.service.MessageRemindService;
+import com.sys.service.MessagesService;
+import com.util.Log;
+import com.util.json.Json;
+import com.util.page.DataGrid;
+import com.util.page.PagedResult;
+
+import springfox.documentation.annotations.ApiIgnore;
+
+
+@Controller
+@Scope("prototype")
+@ApiIgnore
+@RequestMapping("weeks")
+public class WeeksPlanController {
+	@Autowired
+	private WeeksPlanService weeksplanService;
+	@Autowired
+	private WeeksPlanNextService weeksplannextService;
+	@Autowired
+	private WeeksPlanMessageSerivce weeksplanmessageService;
+	@Autowired
+	private MessagesService messagesService;
+	@Autowired
+	private MessageRemindService messageRemindService;
+	@Autowired
+	private DeptService deptService;
+	@Autowired
+	private UserService userService;
+	
+	//周计划跳转
+	@RequestMapping("weekplan")
+	public ModelAndView creatweekplan(@Param("type")int type,HttpServletRequest request){
+		ModelAndView mv=new ModelAndView();
+		
+		Calendar cal = Calendar.getInstance();
+		int thisweek = cal.get(Calendar.WEEK_OF_YEAR);
+		 Calendar date = Calendar.getInstance();
+	     String year = String.valueOf(date.get(Calendar.YEAR));
+	     User user=(User)request.getSession().getAttribute("user");
+		WeeksPlan weeksPlan=weeksplanService.selectlastweek(user.getUid(),year,thisweek-1);
+		mv.addObject("lastweek",weeksPlan);
+		//上周周计划下周计划表
+		if(weeksPlan!=null)
+		mv.addObject("lastweeknext", weeksplannextService.selectbynext(weeksPlan.getWid()));
+	
+		if(type==1){
+			mv.addObject("type",1);
+		}else{
+			mv.addObject("type",2);
+		}
+		mv.setViewName("plan/weekplan");
+		return mv;
+	}
+	//周计划列表跳转
+	@RequestMapping("weekplanlist")
+	public ModelAndView weekplanlist(HttpServletRequest request){
+		ModelAndView mv=new ModelAndView();
+		User user=(User)request.getSession().getAttribute("user");
+		Calendar cal = Calendar.getInstance();
+		Integer weeks = cal.get(Calendar.WEEK_OF_YEAR)+1;
+		Integer years = cal.get(Calendar.YEAR);
+		WeeksPlan a=weeksplanService.selectweekdept(user.getDid(), years, weeks);
+		if(a==null){
+			mv.addObject("plan","aa");
+		}
+		if(user.getRid()==1)
+		mv.addObject("role",1);
+		List<WeeksPlan> list=weeksplanService.selectlist();
+		if(list!=null){
+			for(int i=0;i<list.size();i++){
+				Calendar ca = Calendar.getInstance();//创建一个日期实例
+				ca.setTime(list.get(i).getCreateTime());
+		        int d = 0;
+		        if (ca.get(Calendar.DAY_OF_WEEK) == 1) {
+		            d = -6;
+		        } else {
+		            d = 2 - ca.get(Calendar.DAY_OF_WEEK);
+		        }
+		        ca.add(Calendar.DAY_OF_WEEK, d);
+		        // 所在周开始日期
+		       
+		        Date newDate1 = addDate(ca.getTime(),7); // 指定日期加上天
+		        list.get(i).setMonday(newDate1);
+		        Date newDate2 = addDate(ca.getTime(),13);
+		        list.get(i).setSunday(newDate2);
+			}
+		}
+		if(list!=null)
+		mv.addObject("list",list);
+		mv.setViewName("plan/weeksplanlist");
+		return mv;
+	}
+	
+	
+	//更新下周计划跳转
+		@RequestMapping("weeksplannextskip")
+		public ModelAndView weeksplannextskip(int wid,HttpServletRequest request){
+			ModelAndView mv=new ModelAndView();
+			//周计划下周计划表
+		WeeksPlan weeksPlan=weeksplanService.selectBywid(wid);
+			Calendar cal = Calendar.getInstance();
+			int thisweek = cal.get(Calendar.WEEK_OF_YEAR)+1;
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
+			 Calendar date = Calendar.getInstance();
+		     String year = String.valueOf(date.get(Calendar.YEAR));
+		     User user=(User)request.getSession().getAttribute("user");
+		     WeeksPlan weeksPlan2=weeksplanService.selectlastweek(weeksPlan.getUid(),year,thisweek);
+				
+				if(weeksPlan2!=null){
+				mv.addObject("lastweek",weeksPlan);
+				//下周计划表
+				mv.addObject("lastweeknext", weeksplannextService.selectbynext(weeksPlan.getWid()));
+				}
+			
+			mv.setViewName("plan/weeksplannextupdate");
+			return mv;
+		}
+		//周计划留言跳转
+		@RequestMapping("weeksplanmessageskip")
+		public ModelAndView weeksplanmessageskip(int wid,HttpServletRequest request){
+		ModelAndView mv=new ModelAndView();
+		//周计划下周计划表
+		request.getSession().setAttribute("messagewid", wid);
+		mv.setViewName("plan/weeksplanmessagelist");
+		return mv;
+		}
+		
+	//新建周计划
+	@RequestMapping(value="creatweekplan",method=RequestMethod.POST)
+	@ResponseBody
+	public Json creatweekplan(@RequestBody List<WeeksPlanNext> weeksplannext,HttpServletRequest request ){
+		try{
+		/*DateTest.getThisWeekMonday(new Date());
+		DateTest.getThisWeekSunday(new Date());*/
+		//获取第几周
+		/*Calendar calendar = Calendar.getInstance();
+		int weekNum = calendar.get(Calendar.WEEK_OF_MONTH);*/
+		//获取时间与uid
+			Calendar ca = Calendar.getInstance();//创建一个日期实例
+			/*SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); // 日期格式
+			Date date = dateFormat.parse("2018-12-30"); // 指定日期*/
+			Date date=new Date();
+			ca.setTime(date);
+	        int d = 0;
+	        if (ca.get(Calendar.DAY_OF_WEEK) == 1) {
+	            d = -6;
+	        } else {
+	            d = 2 - ca.get(Calendar.DAY_OF_WEEK);
+	        }
+	        ca.add(Calendar.DAY_OF_WEEK, d);
+	        // 所在周开始日期
+	        String data1 = new SimpleDateFormat("yyyy/MM/dd").format(ca.getTime());
+	        Date newDate1 = addDate(new Date(data1),7); // 指定日期加上天
+			
+			System.out.println(newDate1);
+		User user=(User)request.getSession().getAttribute("user");
+		WeeksPlan weeksplan =new WeeksPlan();
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(newDate1);
+		
+			
+			/*System.out.println(cal.get(Calendar.WEEK_OF_YEAR)+"周");//获取是第几周*/
+			weeksplan.setWeeks(cal.get(Calendar.WEEK_OF_YEAR));
+			weeksplan.setYears(cal.get(Calendar.YEAR));
+			weeksplan.setMonths(cal.get(Calendar.MONTH)+1);
+			
+		
+		weeksplan.setUid(user.getUid());
+		weeksplan.setCreateTime(new Date());
+		weeksplan.setType(1);
+		//如果weeksplannext集合里remarks存在，取出存进weeksplan类
+		for(int i =0;i<weeksplannext.size();i++){
+			if(weeksplannext.get(i).getRemarks()!=null)
+			weeksplan.setRemarks(weeksplannext.get(i).getRemarks());
+			
+			weeksplan.setType(weeksplannext.get(i).getType());
+		}
+		//执行调用接口存储主表
+			Integer n=weeksplanService.creatweeksplan(weeksplan);
+		if(n!=null){
+			for(int k=0;k<weeksplannext.size();k++){
+			WeeksPlanNext weekpn=weeksplannext.get(k);
+			weekpn.setState(1);
+			weekpn.setWid(n);
+			weeksplannextService.creatweeksplannext(weekpn);
+			}	
+			return new Json(200,"提交成功",null);
+		}else{
+			return new Json(201,"提交失败",null);
+		}
+		}catch(Exception e){
+			 Log.getLogger().error(e.getMessage(),e);  
+		      return new Json(500,null,null);
+		}
+	}
+	//周计划列表
+	@RequestMapping("/weekslistPage")
+	@ResponseBody
+	public DataGrid weekslistPage(HttpServletRequest request){
+		DataGrid datagrid=new DataGrid();
+		String page=request.getParameter("page");
+		String rows=request.getParameter("rows");
+		Calendar cal = Calendar.getInstance();
+		//取本周，本来是本月，因为懒得改接口数据库，就用月的名字了
+		int thisweek = cal.get(Calendar.WEEK_OF_YEAR);
+		Integer month = cal.get(Calendar.WEEK_OF_YEAR);
+		Integer year = cal.get(Calendar.YEAR);
+		User user=(User)request.getSession().getAttribute("user");
+		
+		if(user.getRid()==1){
+		 PagedResult<WeeksPlan> pagedResult=weeksplanService.selectall(year,thisweek,Integer.parseInt(page),Integer.parseInt(rows));
+		 if(pagedResult.getDataList()!=null&&pagedResult.getDataList().size()!=0){
+			 datagrid.setTotal(pagedResult.getTotal());
+			 datagrid.setRows(pagedResult.getDataList());
+		 }
+		 	return datagrid;
+		}else{
+			
+			 PagedResult<WeeksPlan> pagedResult=weeksplanService.weeksplanauditleader(year,month,user.getDid(),Integer.parseInt(page),Integer.parseInt(rows));
+			 
+			 if(pagedResult.getDataList()!=null&&pagedResult.getDataList().size()!=0){
+		 datagrid.setTotal(pagedResult.getTotal());
+		 datagrid.setRows(pagedResult.getDataList());
+	 }
+	 	return datagrid;
+		}
+		/*User user2=weeksplanService.selectrole(user.getUid());
+		if(user2!=null){
+			 PagedResult<WeeksPlan> pagedResult=weeksplanService.weeksplanauditleader(year,month,Integer.parseInt(page),Integer.parseInt(rows));
+			 
+					 if(pagedResult.getDataList()!=null&&pagedResult.getDataList().size()!=0){
+				 datagrid.setTotal(pagedResult.getTotal());
+				 datagrid.setRows(pagedResult.getDataList());
+			 }
+			 	return datagrid;
+		}else{
+			 PagedResult<WeeksPlan> pagedResult=weeksplanService.weeksplanauditleader(year,month,user.getDid(),Integer.parseInt(page),Integer.parseInt(rows));
+			 
+			 if(pagedResult.getDataList()!=null&&pagedResult.getDataList().size()!=0){
+		 datagrid.setTotal(pagedResult.getTotal());
+		 datagrid.setRows(pagedResult.getDataList());
+	 }
+	 	return datagrid;
+		}*/
+	}
+	//周计划留言列表
+		@RequestMapping("/weeksplanmessagelist")
+		@ResponseBody
+		public DataGrid weeksplanmessagelist(HttpServletRequest request){
+			DataGrid datagrid=new DataGrid();
+			String page=request.getParameter("page");
+			String rows=request.getParameter("rows");
+			int wid=(Integer) request.getSession().getAttribute("messagewid");
+			 PagedResult<WeeksPlanMessage> pagedResult=weeksplanmessageService.selectall(wid,Integer.parseInt(page),Integer.parseInt(rows));
+			 if(pagedResult.getDataList()!=null&&pagedResult.getDataList().size()!=0){
+				 datagrid.setTotal(pagedResult.getTotal());
+				 datagrid.setRows(pagedResult.getDataList());
+			 }
+			 	return datagrid;
+		}
+	//周计划详情
+	@RequestMapping(value="/weeksplanparticulars",method=RequestMethod.GET)
+	@ResponseBody	
+	public ModelAndView weeksplanparticulars( @Param("wid")int wid ,@Param("uid")int uid,HttpServletRequest request){
+		/*Date date=DateTest.getLastWeekDay(new Date());
+		Date lastweekmonday=DateTest.getThisWeekMonday(date);
+		Date lastweeksunday=DateTest.getThisWeekSunday(date);*/
+		//取本年年份跟本周是本年第几周
+		ModelAndView mv=new ModelAndView();
+	
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
+		
+	     User user=(User)request.getSession().getAttribute("user");
+	     Calendar ca = Calendar.getInstance();//创建一个日期实例
+			/*SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); // 日期格式
+			Date date = dateFormat.parse("2018-12-30"); // 指定日期*/
+			Date date=new Date();
+			ca.setTime(date);
+	        int d = 0;
+	        if (ca.get(Calendar.DAY_OF_WEEK) == 1) {
+	            d = -6;
+	        } else {
+	            d = 2 - ca.get(Calendar.DAY_OF_WEEK);
+	        }
+	        ca.add(Calendar.DAY_OF_WEEK, d);
+	        // 所在周开始日期
+	        String data1 = new SimpleDateFormat("yyyy/MM/dd").format(ca.getTime());
+	        Date newDate1 = addDate(new Date(data1),7); // 指定日期加上天
+	        Calendar cal = Calendar.getInstance();
+			cal.setTime(newDate1);
+			
+		WeeksPlan weekspan=weeksplanService.selectBywid(wid);
+		//周计划主表
+		mv.addObject("week",weekspan);
+		//周计划下周计划表
+		mv.addObject("weeknext", weeksplannextService.selectbynext(wid));
+		WeeksPlan weeksPlan=new WeeksPlan();
+		if(cal.get(Calendar.DAY_OF_YEAR)==weekspan.getYears()){
+			weeksPlan=weeksplanService.selectlastweek(uid,String.valueOf(ca.get(Calendar.DAY_OF_YEAR)),ca.get(Calendar.DAY_OF_WEEK)+1);
+		}else{
+			 weeksPlan=weeksplanService.selectlastweek(uid,String.valueOf(cal.get(Calendar.DAY_OF_YEAR)),cal.get(Calendar.DAY_OF_WEEK));
+		}
+		if(weeksPlan!=null){
+		mv.addObject("lastweek",weeksPlan);
+		//上周周计划下周计划表
+		mv.addObject("lastweeknext", weeksplannextService.selectbynext(weeksPlan.getWid()));
+		}
+		mv.addObject("message", weeksplanmessageService.selectthree(wid));
+		mv.addObject("userid", user.getUid());
+		mv.setViewName(	"plan/weeksplanparticulars");
+		return mv;
+	}
+	
+	
+	@RequestMapping(value="weeksplandelect",method=RequestMethod.POST)
+	@ResponseBody
+	public Json weeksplandelect(int id){
+		try{
+			if(weeksplannextService.weeksplannextdelect(id)==1){
+				return new Json(200,"提交成功",null);
+			}
+			return new Json(201,"失败",null);
+		}catch(Exception e){
+			 Log.getLogger().error(e.getMessage(),e);  
+		      return new Json(500,null,null);
+		}
+	}
+	//周计划完成状态
+	@RequestMapping(value="weeksplannextupdate",method=RequestMethod.POST)
+	@ResponseBody
+	public Json weeksplannextupdate(int id,String remarks){
+		try{
+			WeeksPlanNext weeksplannext=new WeeksPlanNext();
+			weeksplannext.setState(3);
+			weeksplannext.setId(id);
+			weeksplannext.setRemarks(remarks);
+			if(weeksplannextService.weeksplannextupdate(weeksplannext)==1){
+				return new Json(200,"成功",null);
+			}
+			return new Json(201,"失败",null);
+		}catch(Exception e){
+			 Log.getLogger().error(e.getMessage(),e);  
+		      return new Json(500,null,null);
+		}
+	}
+	//下周计划更新
+		@RequestMapping(value="updateweekplannext",method=RequestMethod.POST)
+		@ResponseBody
+		public Json updateweekplannext(@RequestBody List<WeeksPlanNext> weeksplannext,HttpServletRequest request ){
+			try{
+				
+			
+				if(weeksplannextService.weeksplannextinsert(weeksplannext)!=null){
+			return new Json(200,"提交成功",null);
+			}else{
+				return new Json(201,"提交失败",null);
+			}
+			
+			}catch(Exception e){
+				 Log.getLogger().error(e.getMessage(),e);  
+			      return new Json(500,null,null);
+			}
+		}
+		//详情留言
+		@RequestMapping(value="creatweekplanmessage",method=RequestMethod.POST)
+		@ResponseBody
+		public Json creatweekplanmessage(WeeksPlanMessage weeksplanmessage,HttpServletRequest request ){
+			try{
+				User user=(User)request.getSession().getAttribute("user");
+				weeksplanmessage.setCreateBy(user.getName());
+				weeksplanmessage.setCreateTime(new Date());
+				if(weeksplanmessageService.creatweekplanmessage(weeksplanmessage)==1){
+					return new Json(200,"提交成功",null);
+				}
+				return new Json(201,"提交失败",null);
+		}catch(Exception e){
+			 Log.getLogger().error(e.getMessage(),e);  
+		      return new Json(500,null,null);
+		}
+		}
+		//留言实时消息显示
+	@RequestMapping(value="creatweekleaveamessage",method=RequestMethod.POST)
+	@ResponseBody
+	public Json creatweekleaveamessage( @RequestParam("wid") Integer wid,@RequestParam("flag") Integer flag,HttpServletRequest request){
+		try{
+					
+			String body ="";
+			if(flag==1)body="发起";
+			else if(flag==2)body="修改";
+			else if(flag==3)body="留言";
+			User user=(User)request.getSession().getAttribute("user");
+			WeeksPlan weeksPlan =weeksplanService.selectBywid(wid);
+			User user2=userService.selectuid(weeksPlan.getUid());
+			Dept dept=deptService.selectByPrimaryKey(user2.getDid());
+			List<User> usize=weeksplanService.selectdeptsize(dept.getId());
+			Integer messageid=messagesService.create(
+								new Messages(user.getName()+body+"了"+dept.getDepartmentname()+"的第"+
+							weeksPlan.getWeeks()+"周计划",2,wid));
+			if(messageid!=0){
+				List<MessageRemind> mrs=new ArrayList<MessageRemind>();
+				Date date=new Date();
+				for(int i=0;i<usize.size();i++){
+				MessageRemind mr=new MessageRemind();
+				mr.setMid(messageid);
+				mr.setState(0);
+				mr.setUid(usize.get(i).getUid());
+				mr.setReadingTime(date);
+				mrs.add(mr);
+				}
+				//同时推送模板消息
+				if(messageRemindService.creates(mrs)!=0){
+				return new Json(200,"操作成功！",null);
+				}else return new Json(201,"操作失败！",null);
+				}
+				else return new Json(201,"操作失败！",null);
+					}catch(Exception e){
+						 Log.getLogger().error(e.getMessage(),e);  
+					      return new Json(500,null,null);
+					}
+				}
+	//计划汇总
+	@RequestMapping(value="summarize")
+	public ModelAndView summarize(@Param("years")int years,@Param("weeks")int weeks,HttpServletRequest request){
+		ModelAndView mv=new ModelAndView();
+		/*Calendar cal = Calendar.getInstance();
+		int weeks = cal.get(Calendar.WEEK_OF_YEAR);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
+		 Calendar date = Calendar.getInstance();
+		 int years = date.get(Calendar.YEAR);*/
+		
+	List<WeeksPlan> weeksPlan=weeksplanService.selectall2(years, weeks);
+	/*for(WeeksPlan item :weeksPlan){
+		
+		for(WeeksPlanNext li :item.getWeekplan()){
+			System.out.println(li.getStartTime());
+		}
+	}*/
+		mv.addObject("week",weeksPlan);
+		mv.setViewName("plan/weeksummarize");
+		return mv;
+		
+	}
+	public static Date addDate(Date date,long day) throws ParseException {
+		 long time = date.getTime(); // 得到指定日期的毫秒数
+		 day = day*24*60*60*1000; // 要加上的天数转换成毫秒数
+		 time+=day; // 相加得到新的毫秒数
+		 return new Date(time); // 将毫秒数转换成日期
+		}
+}

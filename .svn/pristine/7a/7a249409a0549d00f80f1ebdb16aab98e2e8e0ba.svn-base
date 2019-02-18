@@ -1,0 +1,112 @@
+package com.util.websocket;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.WebSocketMessage;
+import org.springframework.web.socket.WebSocketSession;
+
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
+import com.home.model.User;
+import com.util.Log;
+
+
+
+
+public class MyWebSocketHandler implements WebSocketHandler{
+
+
+    private static final Logger log = Logger.getLogger(MyWebSocketHandler.class);
+
+    // 保存所有的用户session
+    private static final List<WebSocketSession> users = new ArrayList<WebSocketSession>();
+
+
+    public static List<WebSocketSession> getUsers() {
+		return users;
+	}
+	// 连接 就绪时 
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session)
+            throws Exception {
+    	List<Integer> uid=new ArrayList<Integer>();
+    	if(users!=null&&users.size()!=0){
+    		for(int i=0;i<users.size();i++){
+    			WebSocketSession ws=users.get(i);
+    			User user=(User)ws.getAttributes().get("user");
+    			uid.add(user.getUid());
+    		}
+    	}
+    	User user=(User)session.getAttributes().get("user");
+    	if(!uid.contains(user.getUid()))users.add(session);
+    }
+
+
+    // 处理信息
+    @Override
+    public void handleMessage(WebSocketSession session,
+            WebSocketMessage<?> message) throws Exception {
+        Gson gson = new Gson();
+        // 将消息JSON格式通过Gson转换成Map
+        // message.getPayload().toString() 获取消息具体内容
+        Map<String, Object> msg = gson.fromJson(message.getPayload().toString(), 
+                new TypeToken<Map<String, Object>>() {}.getType());
+//      session.sendMessage(message);
+        // 处理消息 msgContent消息内容
+        TextMessage textMessage = new TextMessage(msg.get("msgContent").toString(), true);
+        // 调用方法（发送消息给所有人）
+        sendMsgToAllUsers(textMessage);
+    }
+    public static int wxWebsocket(String msg){
+    	TextMessage textMessage = new TextMessage(msg, true);
+    	 try {
+			sendMsgToAllUsers(textMessage);
+	    	return 200;
+		} catch (Exception e) {
+			Log.getLogger().error(e.getMessage(),e);  
+			return 500;
+		}
+    }
+
+    // 处理传输时异常
+    @Override
+    public void handleTransportError(WebSocketSession session,
+            Throwable exception) throws Exception {
+    }
+
+
+
+    // 关闭 连接时
+    @Override
+    public void afterConnectionClosed(WebSocketSession session,
+            CloseStatus closeStatus) throws Exception {
+        users.remove(session);
+
+    }
+
+
+
+    @Override
+    public boolean supportsPartialMessages() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+
+
+    // 给所有用户发送 信息
+    public static void sendMsgToAllUsers(WebSocketMessage<?> message) throws Exception{
+        for (WebSocketSession user : users) {
+            user.sendMessage(message);
+        }
+
+    }
+
+}

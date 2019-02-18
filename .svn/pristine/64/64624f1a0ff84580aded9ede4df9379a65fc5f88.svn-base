@@ -1,0 +1,189 @@
+<%@ page contentType="text/html;charset=utf-8"%>
+<%@ taglib prefix="c"  uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%
+String path = request.getContextPath();
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+<!DOCTYPE HTML>
+<html>
+<head>
+
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    	
+    <link rel="stylesheet" href="<%=basePath%>jsAndcss/ymnets.easyui/themes/base/easyui.css" type="text/css"></link>
+
+	<link href="<%=basePath%>jsAndcss/ymnets.easyui/content/fontawesome/css/font-awesome.min.css" rel="stylesheet" /></head>
+	<script type="text/javascript" src="<%=basePath%>jsAndcss/ymnets.easyui/jquery.min.js"></script>
+	<script type="text/javascript" src="<%=basePath%>jsAndcss/ymnets.easyui/jquery.easyui.min.js"></script>
+    <link href="<%=basePath%>jsAndcss/ymnets.easyui/themes/skin-green.css" rel="stylesheet" />
+    
+    <link rel="stylesheet" href="<%=basePath%>ueditor/themes/default/css/umeditor.css" type="text/css"></link>
+    <script type="text/javascript" src="<%=basePath%>ueditor/third-party/jquery.min.js"></script>
+    <script type="text/javascript" src="<%=basePath%>ueditor/umeditor.config.js"></script>
+    <script type="text/javascript" src="<%=basePath%>ueditor/umeditor.min.js"></script>
+    <script type="text/javascript" src="<%=basePath%>ueditor/umeditor.min.js"></script>
+    <script type="text/javascript" src="<%=basePath%>ueditor/lang/zh-cn/zh-cn.js"></script>
+	<script
+	src="<%=basePath%>jsAndcss/ymnets.easyui/locale/easyui-lang-zh_CN.js"></script>
+</head>
+<style>
+td{border:solid #CCCCCC; border-width:0px 1px 1px 0px; padding:10px 20px;}
+table{border:solid #CCCCCC; border-width:1px 0px 0px 1px;font-size: 1.2em;}
+</style>
+<body>
+	<div style="padding:5px 5px 0px 20px;">
+		<div class="mvctool">
+		<table style="width: 100%;line-height: 200%;">
+			<thead>
+			</tr>
+			<td colspan="2"><font style="font-weight:bold;width: 100%;">文件名称：</font>${announcement.title }</td></tr>
+				
+				<tr ><td colspan="2"><font style="font-weight: bold;size">文件类型：</font>
+				<c:if test="${announcement.type==1}">协同文件</c:if>
+				
+				<c:if test="${announcement.type==2}">办理文件</c:if>
+				<c:if test="${announcement.type==3}">集团红头</c:if>
+				</td>
+				</tr>
+				<td colspan="2"><font>发布时间：</font>
+				<fmt:formatDate value="${announcement.date }"  pattern="yyyy-MM-dd"/></td>
+				</tr>
+				<td colspan="2"><font>发布人：</font>${announcement.createBy}</td>
+				<c:if test="${announcement.range!=null}">
+				<tr><td colspan="2"><font>发布范围：</font>${announcement.range}</td></tr></c:if>
+				
+				<tr><td colspan="2"><font style="font-weight: bold;">正题：</font>${announcement.text }</td></tr>
+				<tr ><td><font>开始时间：</font>
+				<fmt:formatDate value="${announcement.startTime }"  pattern="yyyy-MM-dd"/></td>
+				<td><font>截止时间：</font>
+				<fmt:formatDate value="${announcement.endTime }"  pattern="yyyy-MM-dd"/></td>
+				</tr>
+				
+				<tr>
+						<td colspan="2"><font style="font-weight: bold;">附件：</font>
+						<c:if test="${fn:length(files) == 0 }">暂无附件</c:if>
+							<c:forEach items="${files }" var="file">
+					<a href="../home/download?filename=${file.attachment }">${file.attachment }</a>
+					
+					&nbsp;&nbsp;&nbsp;
+				</c:forEach>
+						</td>
+					</tr>
+				<tr>
+				<c:if test="${announcement.invitation!=null}"><td colspan="2"><font style="font-weight: bold;">撤回理由：</font>${announcement.invitation}</td></c:if>
+				</tr>
+				<tr>
+				<c:if test="${state!=null}"><td colspan="2"><font style="font-weight: bold;">待办文件完成状态：</font><c:if test="${state.state==1}">已完成</br><font style="font-weight: bold;">填报进展：</font>${state.remarks }</c:if><c:if test="${state.state==0}"><a href="javascript:void(0)"  class="easyui-linkbutton"  onclick="confirm('${announcement.id}')" style="width:75px; height:32px">点击完成</a></c:if>  </c:if>
+				</tr>
+				
+				<tr>
+				<c:if test="${all!=null}"><td colspan="2"><font style="font-weight: bold;">待办文件完成状态：</font>
+				 <c:forEach items="${all}" var="a" varStatus="status">
+					<br>
+						${a.name}:<c:if test="${a.state==0}">未完成</c:if><c:if test="${a.state==1}">已完成</c:if>
+						
+					</c:forEach> 
+				</c:if>
+				</tr>
+				
+			</thead>
+		</table>
+	</div>
+	<script type="text/javascript">
+				var file="${announcement.file }";
+				if(file==''){
+				$("#file").text('无');
+				}else{
+				var index = file.lastIndexOf("\/");  
+				file  = file .substring(index + 1, file .length);
+				   $("#file").text(file);
+				   }
+			</script>
+	<script type="text/javascript">
+	
+	$(function(){
+	demos();
+	});
+		function demos(){
+		
+		var id = "${ aid }";
+	
+			$.ajax({
+						type : "POST",
+						url : "updatereadstate",
+						data : {
+							id : id
+						},
+						success : function(data) {
+									if (data.code == 200) {
+							};
+					   },
+						error: function (request) {	
+                          $.messager.alert('系统提示','请求出错！','error');
+                      }
+					});
+		}
+	
+	
+	
+	function confirm(id) {
+	
+		if(id!=null){
+		$.messager.prompt('系统提示', '请输入进展', function(r) {
+				if (r) {
+					$.ajax({
+						type : "POST",
+						url : "updateanncstate",
+						data : {
+							id : id,remarks:r
+						},
+						success : function(data) {
+									if (data.code == 200) {
+									var id="${announcement.id}";
+									
+                          			setTimeout("location.href='particulars?id="+id+"'", 500);
+								};
+					   },
+						error: function (request) {	
+                          $.messager.alert('系统提示','请求出错！','error');
+                      }
+					});
+				}
+			});
+		}
+		}
+		function delfile(id){
+		$.messager.confirm('删除', '确定要删除该附件吗?', function(r) {
+				if (r) {
+		var yid="${year.yid}";
+		var uid="${year.uid}";
+		 $.ajax({
+                      type: "GET",
+                      url: "../home/delfile",
+                      data:"id="+id,
+                      success: function (data) {
+                          if (data.code > 0) {
+                          			$.messager.show({
+									title:'系统提示',
+									msg:data.message,
+									timeout:5000,
+									showType:'slide'
+								});
+								  setTimeout("location.href='yearplanparticulars?yid="+yid+"&uid="+uid+"'", 500);
+                          }
+                      },
+                      error: function (request) {
+                          $.messager.alert('系统提示','请求出错！','error');
+                      }
+                  });
+                  	}
+			});
+	}
+		
+	</script>
+</body>
+</html>

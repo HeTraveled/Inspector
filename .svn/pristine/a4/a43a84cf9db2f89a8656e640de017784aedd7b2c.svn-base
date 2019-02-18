@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+		<bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">    
+        <property name="converters">    
+            <list>
+                <bean class="com.util.DateConverter" />    
+            </list>    
+        </property>    
+    </bean> 
+	<!--需要自动扫描装配的bean(目录)-->
+	<context:component-scan base-package="com.**.controller"/>
+	<!-- swagger -->
+	<context:component-scan base-package="com.util.swagger"/>
+	<!--websocket  -->
+	<context:component-scan base-package="com.util.websocket" />
+	<!-- 定时器 -->
+	<context:component-scan base-package="com.util.timing" />
+	<task:annotation-driven/>
+	<mvc:annotation-driven conversion-service="conversionService" />
+	<mvc:default-servlet-handler/>
+	<!-- 对模型视图名称的解析，在请求时模型视图名称添加前后缀 -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/jsp/"/>
+		<property name="suffix" value=".jsp"/>
+		 <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />  
+	</bean>
+	<!-- 设置上传文件最大值   1M=1*1024*1024(B)=1048576 bytes -->    
+<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">    
+    <property name="maxUploadSize" value="20480000000" />    
+    <property name="defaultEncoding" value="UTF-8"/>
+    <property name="resolveLazily" value="true"/>
+</bean> 
+<mvc:interceptors>
+    <!-- 多个拦截器，按顺序执行 -->        
+    <mvc:interceptor>
+        <mvc:mapping path="/**"/> <!-- 表示拦截所有的url包括子url路径 -->
+        <mvc:exclude-mapping path="/wechat/**"/>
+        <bean class="com.util.HandlerInterceptorr"/>
+    </mvc:interceptor>
+</mvc:interceptors>
+</beans>

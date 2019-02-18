@@ -1,0 +1,214 @@
+.aaa a {color:#808080;text-decoration:none;}
+.aaa a:link {color:#808080;text-decoration:none;}     /* 未被访问的链接     */
+.aaa a:visited {color:#808080;text-decoration:none;}  /* 已被访问过的链接    */
+.aaa a:hover {color:#808080;text-decoration:none;}    /* 鼠标悬浮在上的链接  */
+.aaa a:active {color:#808080;text-decoration:none;}   /* 鼠标点中激活链接    */
+.cc .panel-header {
+	padding: 0;
+	border: 0;
+}
+
+.cc .panel-title {
+	padding-left: 5px;
+	background: #fff;
+	line-height: 28px;
+	border: 0;
+	border-bottom: 1px #d3d3d3 solid;
+	color: #666;
+}
+
+.cc .alphac {
+	filter: Alpha(Opacity = 70);
+	-moz-opacity: .7;
+	opacity: .7;
+}
+
+.cc {
+	position: relative;
+	height: 200px;
+	width: 100px;
+}
+
+.groupSave {
+	display: none;
+}
+
+.cc .panel-tool {
+	display: none;
+}
+
+.checkBoxPart {
+	width: 150px;
+	height: 26px;
+	line-height: 40px;
+	padding-left: 20px;
+}
+
+.checkBoxPart input,.checkBoxPart lable {
+	vertical-align: middle;
+	vertical-align: middle;
+	margin: 0;
+	margin-right: 4px;
+}
+
+#dataPart,#myJobPart,#notePart,#noticePart,#shortcutPart {
+	overflow: hidden;
+	position: absolute;
+}
+
+.ddcontent {
+	min-height: 50px;
+	padding: 5px;
+	background: #fff;
+}
+
+.btn.tile-button {
+	display: block;
+	text-align: center;
+}
+
+.bg-gray-alt.btn.tile-button:hover,.bg-gray.btn.tile-button:hover,.bg-white.btn.tile-button:hover .tile-header
+	{
+	color: #000;
+}
+
+.tile-header {
+	padding: 10px;
+	font-size: 14px;
+	text-transform: uppercase;
+	background: rgba(255, 255, 255, .2);
+}
+
+.tile-content-wrapper {
+	padding: 10px 10px 17px;
+	position: relative;
+	overflow: hidden;
+}
+
+.tile-content {
+	font-size: 35px;
+	text-align: right;
+}
+
+.tile-content span {
+	font-size: 25px;
+	-moz-opacity: .7;
+	filter: alpha(opacity : 70);
+	opacity: .7;
+}
+
+.tile-content-wrapper small {
+	-moz-opacity: .7;
+	filter: alpha(opacity : 70);
+	opacity: .7;
+	text-align: right;
+	font-size: 14px;
+	display: block;
+}
+
+.tile-content-wrapper>.glyph-icon {
+	position: absolute;
+	font-size: 65px;
+	height: 70px;
+	line-height: 70px;
+	top: 50%;
+	margin-top: -40px;
+	-moz-opacity: .3;
+	filter: alpha(opacity : 30);
+	opacity: .3;
+	left: 15px;
+}
+
+.tile-footer {
+	padding: 5px 10px;
+	background: rgba(0, 0, 0, .1);
+	text-align: left;
+}
+
+.tile-footer .glyph-icon {
+	float: right;
+}
+
+.tile-button-alt .tile-header {
+	padding: 5px 10px;
+	text-align: left;
+}
+
+.tile-button-alt .tile-content-wrapper>.glyph-icon {
+	font-size: 35px;
+	width: 100%;
+	margin-top: -36px;
+}
+
+.bg-blue,.hover-blue:hover {
+	color: #fff;
+	background: #5bccf6;
+}
+
+.bg-red,.hover-red:hover {
+	color: #fff;
+	background: #ff5757;
+}
+
+.bg-gray,.hover-gray:hover {
+	background: #efefef;
+}
+
+.bg-gray-alt,.hover-gray-alt {
+	background: #dedede;
+}
+
+.btn.hover-gray-alt:hover,.btn.hover-gray:hover {
+	color: #000;
+}
+
+.bg-black,.hover-black:hover {
+	color: #ccc;
+	background: #212121;
+}
+
+.bg-green,.hover-green:hover {
+	color: #fff;
+	background: #9cd159;
+}
+
+.bg-orange,.btn.bg-white.hover-orange:hover,.hover-orange:hover {
+	color: #fff;
+	background: #fa7753;
+}
+
+.bg-white {
+	background: #fff;
+}
+
+.btn.bg-white:hover {
+	color: #666;
+}
+
+.hover-white:hover {
+	background: #fafafa;
+}
+
+.btn.hover-white:hover {
+	color: #666;
+}
+
+.bg-yellow,.hover-yellow:hover {
+	color: #fff;
+	background: #fc0;
+}
+
+.bg-purple,.hover-purple:hover {
+	color: #fff;
+	background: #984dff;
+}
+
+.bg-blue-alt,.hover-blue-alt:hover {
+	color: #fff;
+	background: #65a6ff;
+}
+
+.bg-azure,.hover-azure:hover {
+	color: #fff;
+	background: #41e5c0;
+}

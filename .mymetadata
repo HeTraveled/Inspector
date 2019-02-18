@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="Inspector"
+  id="myeclipse.1530147914944"
+  context-root="/Inspector"
+  j2ee-spec="5.0"
+  archive="Inspector.war">
+  <attributes>
+    <attribute name="webrootdir" value="src/main/webapp" />
+  </attributes>
+</project-module>
+

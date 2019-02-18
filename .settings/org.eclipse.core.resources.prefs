@@ -1,0 +1,14 @@
+eclipse.preferences.version=1
+encoding//src/main/java=UTF-8
+encoding//src/main/java/com/util/HandlerInterceptorr.java=GBK
+encoding//src/main/java/com/util/MD5.java=GBK
+encoding//src/main/java/com/util/generator/GenMain.java=GBK
+encoding//src/main/java/com/util/page/PagedResult.java=GBK
+encoding//src/main/webapp/WEB-INF/jsp/home/desktop.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/jsp/home/index.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/jsp/home/login.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/jsp/news/creatnews.jsp=UTF-8
+encoding//src/main/webapp/fullcalendar-3.9.0/locale=UTF-8
+encoding//src/main/webapp/jsAndcss/ymnets.easyui/locale=UTF-8
+encoding//src/main/webapp/ueditor-mini1.2.2=UTF-8
+encoding/<project>=UTF-8

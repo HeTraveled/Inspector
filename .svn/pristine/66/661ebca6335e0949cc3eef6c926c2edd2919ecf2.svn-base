@@ -1,0 +1,528 @@
+<%@ page contentType="text/html;charset=utf-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%
+	String path = request.getContextPath();
+	String basePath = request.getScheme() + "://"
+			+ request.getServerName() + ":" + request.getServerPort()
+			+ path + "/";
+%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes" />
+<link href="<%=basePath%>jsAndcss/css/desktop.css" rel="stylesheet" />
+<link href="<%=basePath%>jsAndcss/ymnets.easyui/themes/base/easyui.css"
+	rel="stylesheet" />
+<link
+	href="<%=basePath%>jsAndcss/ymnets.easyui/themes/skin-redlight.css"
+	rel="stylesheet" />
+<link href="<%=basePath%>jsAndcss/ymnets.easyui/content/Site.css"
+	rel="stylesheet" />
+<link
+	href="<%=basePath%>jsAndcss/ymnets.easyui/content/fontawesome/css/font-awesome.min.css"
+	rel="stylesheet" />
+<link href='<%=basePath%>fullcalendar-3.9.0/fullcalendar.min.css'
+	rel='stylesheet' />
+<link href='<%=basePath%>fullcalendar-3.9.0/fullcalendar.print.min.css'
+	rel='stylesheet' media='print' />
+<script src='<%=basePath%>fullcalendar-3.9.0/lib/moment.min.js'></script>
+<script src="<%=basePath%>jsAndcss/ymnets.easyui/jquery.min.js"></script>
+<script src="<%=basePath%>jsAndcss/ymnets.easyui/jquery.easyui.min.js"></script>
+<script
+	src="<%=basePath%>jsAndcss/ymnets.easyui/content/js/jquery.easyui.plus.js"></script>
+<script src='<%=basePath%>fullcalendar-3.9.0/fullcalendar.min.js'></script>
+<script src='<%=basePath%>fullcalendar-3.9.0/locale/zh-cn.js'
+	charset="utf-8"></script>
+<script src="<%=basePath%>jsAndcss/ymnets.easyui/content/js/common.js"></script>
+<link rel="stylesheet" type="text/css" href="<%=basePath%>css/flash.css">
+</head>
+<body>
+	<div id="preloader_2" class="p2"
+		style="width:66px;height:66px;position:absolute;top:40%;left:50%;">
+		<span></span> <span></span> <span></span> <span></span>
+	</div>
+	<div style="padding:4px 5px 0px 5px;display: none;" id="body">
+		<div id="modalwindowContent" class="easyui-window"
+			data-options="modal:true,closed:true,minimizable:false,shadow:false,maximized:true"></div>
+		<div id="modalwindowContent2" class="easyui-window"
+			data-options="modal:true,closed:true,minimizable:false,shadow:false"></div>
+		<div style="padding:0px 23px;clear:both">
+			<div class="cc">
+				<div id="shortcutPart" class="easyui-draggable panel"
+					data-options="handle:'#title1'">
+
+					<div id="shortcutPartContent" class="panel-body ddcontent"
+						style="border: 0;width:100%">
+						<table style="width:100%;">
+							<tr>
+								<td style="width:20%">
+									<div style="width:95%;">
+										<a
+											href="javascript:parent.addTab('待办公文','../Annc/accomplishskip','fa fa-file-text-o')"
+											class="tile-button btn bg-green" title="">
+											<div class="tile-content-wrapper">
+												<i class="glyph-icon fa fa-file-text-o fa-5x"></i>
+												<c:if test="${announcementstate!=0}">
+													<div class="tile-content">${announcementstate}项</div>
+												</c:if>
+
+												<c:if test="${announcementstate==0}">
+													<div class="tile-content">暂无</div>
+												</c:if>
+												<small> <i class="fa fa-file-text-o"></i> 待办公文 </small>
+											</div>
+											<div class="tile-footer">
+												查看详情 <i class="glyph-icon fa fa-arrow-right"></i>
+											</div> </a>
+									</div></td>
+								<!--  
+								<td style="width:20%">
+									<div style="width:95%;">
+										<a href="javascript:parent.addTab('制度表格','../regulations/data','fa fa-list-alt')" class="tile-button btn bg-blue-alt"
+											title="">
+											<div class="tile-content-wrapper">
+												<i class="glyph-icon fa fa-list-alt fa-5x"></i>
+												<div class="tile-content">
+													<c:if test="${regulationsNum==0 }">暂无</c:if>
+												<c:if test="${regulationsNum!=0 }">${regulationsNum }个</c:if>
+												</div>
+												<small> <i class="glyph-icon fa fa-list-alt"></i>
+													制度表格 </small>
+											</div>
+											<div class="tile-footer">
+												查看详情 <i class="glyph-icon fa fa-arrow-right"></i>
+											</div> </a>
+									</div></td>
+									-->
+<td style="width:20%">
+									<div style="width:95%;">
+										<a href="javascript:parent.addTab('本月工作','../month/thisplanlist','fa fa-calendar-check-o')" class="tile-button btn bg-azure"
+											title="">
+											<div class="tile-content-wrapper">
+												<i class="glyph-icon fa fa-calendar-minus-o"></i>
+												<c:if test="${plansize!=null}"><c:if test="${plansize!=0}">
+												<div class="tile-content">${plansize}项</div></c:if></c:if>
+												<c:if test="${plansize!=null}">
+												<c:if test="${plansize==0}">
+												<div class="tile-content">暂无</div></c:if></c:if>
+												<c:if test="${plansize==null}"><div class="tile-content">暂无</div></c:if>
+												
+												<small> <i class="glyph-icon fa fa-calendar-minus-o"></i>
+													本月工作 </small>
+											</div>
+											<div class="tile-footer">
+												查看详情 <i class="glyph-icon fa fa-arrow-right"></i>
+											</div> </a>
+									</div></td>
+								<td style="width:20%">
+									<div style="width:95%;">
+										<a
+											href="javascript:parent.addTab('督查事项一览表','../inspector/data?state=2','fa fa-file-text-o')"
+											class="tile-button btn bg-red" title="">
+											<div class="tile-content-wrapper">
+												<i class="glyph-icon fa fa-clock-o"></i>
+												<div class="tile-content">
+													<c:if test="${progressNum==0 }">暂无</c:if>
+													<c:if test="${progressNum!=0 }">${progressNum }个</c:if>
+												</div>
+												<small> <i class="glyph-icon fa fa-clock-o"></i>
+													进行中的督查事项 </small>
+											</div>
+											<div class="tile-footer">
+												查看详情 <i class="glyph-icon fa fa-arrow-right"></i>
+											</div> </a>
+									</div></td>
+								<td style="width:20%">
+									<div style="width:95%;">
+										<a
+											href="javascript:parent.addTab('督查事项一览表','../inspector/data?state=4','fa fa-file-text-o')"
+											class="tile-button btn bg-yellow" title="">
+											<div class="tile-content-wrapper">
+												<i class="glyph-icon fa fa-ban"></i>
+												<div class="tile-content">
+													<c:if test="${expireNum==0 }">暂无</c:if>
+													<c:if test="${expireNum!=0 }">${expireNum }个</c:if>
+												</div>
+												<small> <i class="glyph-icon fa fa-ban"></i>
+													已超期的督查事项 </small>
+											</div>
+											<div class="tile-footer">
+												查看详情 <i class="glyph-icon fa fa-arrow-right"></i>
+											</div> </a>
+									</div></td>
+							</tr>
+						</table>
+					</div>
+				</div>
+				<div id="noticePart" class="easyui-draggable"
+					data-options="handle:'#noticeTitle'">
+					<div id="noticeTitle" class="panel-header" style="border: 0">
+						<div class="panel-title" style="">
+							<span class="fa fa-file-text-o"></span>&nbsp;&nbsp;督查事项 <span
+								class="aaa"><a style="float: right;"
+								href="javascript:parent.addTab('督查事项一览表','../inspector/data','fa fa-file-text-o')">更多&nbsp;&nbsp;</a>
+							</span>
+						</div>
+						<div class="panel-tool">
+							<a href="javascript:promptValue('noticePart')"
+								class="panel-tool-max"></a><a href="javascript:void(0)"
+								class="panel-tool-close"></a>
+
+						</div>
+					</div>
+					<div id="noticePartContent" class="panel-body ddcontent"
+						style="border: 0">
+						<table
+							style="width:100%;border-collapse:separate; border-spacing:0px 15px;table-layout: fixed;" cellspacing="0">
+							<tr style="height:33px;line-height:33px; padding:5px;">
+								<th align="left" width="40%"><div style="position: relative;left: 20%;">任务描述</div></th>
+								<th align="center" width="40%">事项来源</th>
+								<th align="center" width="20%">完成时限</th>
+							</tr>
+							<tbody>
+								<c:forEach items="${inspectors }" var="ins">
+									<tr style="height:33px;line-height:33px; padding:5px;"
+										align="center">
+										<td align="left"
+											style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;-o-text-overflow:ellipsis;-icab-text-overflow: ellipsis;-khtml-text-overflow: ellipsis;-moz-text-overflow: ellipsis;-webkit-text-overflow: ellipsis;font-weight: bold;">
+											<a class="color-black"
+											href="javascript:Show('${ins.source }','${ins.iid }')">
+												<div class="insbody" id="insbody${ins.iid }"
+													title="${ins.requirements }">${ins.requirements }</div> </a></td>
+											<td
+											style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+											-o-text-overflow:ellipsis;-icab-text-overflow: ellipsis;-khtml-text-overflow: ellipsis;
+											-moz-text-overflow: ellipsis;-webkit-text-overflow: ellipsis;"><a class="color-black"
+											href="javascript:Show('${ins.source }','${ins.iid }')">
+											<div class="inssource" title="${ins.source }">【 <c:if
+													test="${ins.type==1}">会议</c:if> <c:if test="${ins.type==2}">金宏网</c:if>
+												<c:if test="${ins.type==3}">专项督查</c:if> <c:if
+													test="${ins.type==4}">其他</c:if>】${ins.source}</div></a></td>
+										<td><a class="color-black"
+											href="javascript:Show('${ins.source }','${ins.iid }')"> <fmt:formatDate
+													value="${ins.endTime }" pattern="yyyy-MM-dd" /> </a></td>
+									</tr>
+								</c:forEach>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div id="myJobPart" class="easyui-draggable"
+					data-options="handle:'#title5'">
+					<div id="title5" class="panel-header" style="border: 0">
+						<div class="panel-title" style="">
+							<span class="fa fa-calendar-minus-o"></span>&nbsp;&nbsp;日程表
+						</div>
+						<div class="panel-tool">
+							<a href="javascript:promptValue('myJobPart')"
+								class="panel-tool-max"></a><a href="javascript:void(0)"
+								class="panel-tool-close"></a>
+						</div>
+					</div>
+					<div id="myJobPartContent" class="panel-body ddcontent"
+						style="border: 0;width: 100%;height:330px;">
+						<div id='calendar'></div>
+					</div>
+				</div>
+				<div id="dataPart" class="easyui-draggable"
+					data-options="handle:'#title6'">
+					<div id="title6" class="panel-header" style="border: 0">
+						<div class="panel-title" style="">
+							<span class="fa fa-file-text-o"></span>&nbsp;&nbsp;协同文件 <span
+								class="aaa"><a style="float: right;"
+								href="javascript:parent.addTab('协同文件','../Annc/skip','fa fa-file-text-o')">更多&nbsp;&nbsp;</a>
+							</span>
+						</div>
+					</div>
+					<div id="dataPartContent" class="panel-body ddcontent"
+						style="border: 0; background:#fff">
+						<table
+							style="width:100%;border-collapse:separate; border-spacing:0px 8px;">
+							<tbody>
+								<c:forEach items="${annc}" begin="0" end="5" var="a">
+									<tr style="height:33px;line-height:33px; padding:5px;">
+										<td><c:if test="${a.type==1}">&nbsp;&nbsp;&nbsp;[协同文件]&nbsp;</c:if>
+
+											<c:if test="${a.type==2}">&nbsp;&nbsp;&nbsp;[金宏转办]&nbsp;</c:if>
+											<c:if test="${a.type==3}">&nbsp;&nbsp;&nbsp;[集团红头]&nbsp;</c:if>
+
+											<a class="color-black"
+											href="javascript:Show2('${a.title }','${a.id}')">${a.title
+												}</a> <font style="float: right;"> <fmt:formatDate
+													value="${a.date }" pattern="yyyy-MM-dd" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font>
+										</td>
+									</tr>
+								</c:forEach>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div id="notePart" class="easyui-draggable"
+					data-options="handle:'#title7'">
+					<div id="title7" class="panel-header" style="border: 0">
+						<div class="panel-title" style="">
+							<span class="fa fa-calendar-minus-o"></span>&nbsp;&nbsp;工作计划
+						</div>
+						<div class="panel-tool">
+							<a href="javascript:promptValue('notePart')"
+								class="panel-tool-max"></a><a href="javascript:void(0)"
+								class="panel-tool-close"></a>
+						</div>
+					</div>
+					<div id="notePartContent" class="panel-body ddcontent"
+						style="border: 0">
+						<table
+							style="width:100%;border-collapse:separate; border-spacing:0px 15px;">
+							<tbody>
+								<tr style="height:33px;line-height:33px; padding:5px;">
+									<td>&nbsp;&nbsp;&nbsp;[年计划]&nbsp; <c:if
+											test="${yearplan!=null }">
+											<a class="color-black"
+												href="javascript:Show3('详情','${yearplan.yid}')">${yearplan.year}年工作计划</a>
+
+										</c:if> <c:if test="${yearplan==null }">
+										暂无
+										</c:if>
+									</td>
+								</tr>
+								<tr style="height:33px;line-height:33px; padding:5px;">
+									<td>&nbsp;&nbsp;&nbsp;[月计划]&nbsp; <c:if
+											test="${monthplan!=null }">
+											<a class="color-black"
+												href="javascript:Show4('详情','${monthplan.mid}')">${monthplan.years}年${monthplan.months}月工作计划</a>
+										</c:if> <c:if test="${monthplan==null }">
+										暂无
+										</c:if>
+									</td>
+								</tr>
+								<tr style="height:33px;line-height:33px; padding:5px;">
+									<td>&nbsp;&nbsp;&nbsp;[周计划]&nbsp; <c:if
+											test="${weekplan!=null }">
+											<a class="color-black"
+												href="javascript:Show5('详情','${weekplan.wid}','${weekplan.uid }')">${weekplan.years}年第${weekplan.weeks}周工作计划</a>
+										</c:if> <c:if test="${weekplan==null }">
+										暂无
+										</c:if>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="fullSetContent"></div>
+	<script type="text/javascript">
+		$(function() {
+			//选中的将变成最顶层
+			$(".cc div").mousedown(function() {
+				$(".cc div").css("z-index", "0").removeClass("alphac");
+				$(this).css("z-index", "1").addClass("alphac");
+			}).mouseup(function() {
+				$(".cc div").removeClass("alphac");
+			});
+			$('#shortcutPart,#noticePart,#myJobPart,#dataPart,#notePart')
+					.draggable('disable').resizable('disable');
+			if (isExitsFunction(window.parent.fullSetButtonOut)) {
+				$("#fullSetContent").html(window.parent.fullSetButtonOut());
+				$("#fullSetButton").click(
+						function() {
+							if ($(this).attr("class") == "fa fa-expand") {
+								$(this).removeClass("fa-expand").addClass(
+										"fa-compress");
+							} else {
+								$(this).removeClass("fa-compress").addClass(
+										"fa-expand");
+							}
+							window.parent.fullSet();
+						});
+			}
+			var uid = "${uid}";
+			$
+					.ajax({
+						type : "GET",
+						url : "../schedule/scheduleData",
+						data : "uid=" + uid,
+						success : function(data) {
+							$('#calendar')
+									.fullCalendar(
+											{
+												header : {
+													left : 'listMonth',
+													right : 'month,agendaWeek,agendaDay',
+													center : 'title'
+												},
+												navLinks : true,
+												businessHours : true,
+												editable : false,
+												height : 330,
+												events : data.data,
+												eventColor : '#FF6347',
+												fixedWeekCount : false,
+												weekNumbers : true,
+												dayClick : function(date,
+														allDay, jsEvent, view) {
+													date = moment(date).format(
+															"YYYY-MM-DD");
+													$("#modalwindowContent2")
+															.html(
+																	"<iframe width='100%' height='100%' scrolling='no' frameborder='0''  src='../schedule/createSchedulePage?date="
+																			+ date
+																			+ "'></iframe>");
+													$("#modalwindowContent2")
+															.window(
+																	{
+																		title : '新建个人日程',
+																		width : 600,
+																		height : 500,
+																		iconCls : 'fa fa-calendar-minus-o'
+																	}).window(
+																	'open');
+												},
+												eventClick : function(event,
+														jsEvent, view) {
+													$("#modalwindowContent2")
+															.html(
+																	"<iframe width='100%' height='100%' scrolling='no' frameborder='0''  src='../schedule/updateSchedulePage?sid="
+																			+ event.id
+																			+ "'></iframe>");
+													$("#modalwindowContent2")
+															.window(
+																	{
+																		title : '修改个人日程',
+																		width : 600,
+																		height : 500,
+																		iconCls : 'fa fa-calendar-minus-o'
+																	}).window(
+																	'open');
+												}
+											});
+						},
+						error : function(request) {
+							$.messager.alert('系统提示', '请求出错！', 'error');
+						}
+					});
+			SetWebpartLayout();
+			$('.insbody').tooltip();
+			$('.inssource').tooltip();
+		});
+
+		function setProgressbarColor(value, id) {
+			if (value < 100) {
+				value += Math.floor(Math.random() * 2);
+				if (value <= 30) {
+					$("#" + id + " .progressbar-value .progressbar-text").css(
+							"background-color", "#DF4134");
+				} else if (value <= 70) {
+					$("#" + id + " .progressbar-value .progressbar-text").css(
+							"background-color", "#EABA0A");
+				} else if (value > 70) {
+					$("#" + id + " .progressbar-value .progressbar-text").css(
+							"background-color", "#53CA22");
+				}
+				setTimeout(arguments.callee, 200);
+			}
+		}
+		function SetWebpartLayout() {
+			var winWidth = $(window).width();
+			var winHeight = $(window).height();
+
+			var _windowWidth = winWidth - 10;
+			var _windowHeight = winHeight - 12;
+			$("#shortcutPart").width(_windowWidth - 50).height(140);
+			var ddw = $("#shortcutPart").width();
+			var ddh = $("#shortcutPart").height()
+			$("#noticePart,#myJobPart,#dataPart,#notePart").width(
+					_windowWidth / 2 - 40);
+			$("#shortcutPart,#noticePart,#dataPart").css("left", 0);
+			$("#myJobPart,#notePart").css("left", ddw / 2 + 7);
+			$("#shortcutPart").css("top", 0);
+			$("#noticePart,#myJobPart").css("top", ddh + 10);
+			$("#notePart,#dataPart").css("top", ddh + 400);
+			$("#body").show();
+			$("#preloader_2").hide();
+
+		}
+		function Show(source, iid) {
+			$("#modalwindowContent")
+					.html(
+							"<iframe width='100%' height='100%' frameborder='0''  src='../inspector/inspectorDetails?iid="
+									+ iid + "'></iframe>");
+			$("#modalwindowContent").window({
+				title : source,
+				width : 900,
+				height : 880,
+				iconCls : 'fa fa-file-text-o'
+			}).window('open');
+		}
+		function Show2(title, id) {
+			$("#modalwindowContent")
+					.html(
+							"<iframe width='100%' height='100%' frameborder='0''  src='../Annc/particulars?id="
+									+ id + "'></iframe>");
+			$("#modalwindowContent").window({
+				title : title,
+				width : 900,
+				height : 880,
+				iconCls : 'fa fa-file-text-o'
+			}).window('open');
+		}
+		function Show3(title, yid) {
+
+			$("#modalwindowContent")
+					.html(
+							"<iframe width='100%' height='100%' frameborder='0''  src='../year/yearplanparticulars?yid="
+									+ yid + "'></iframe>");
+			$("#modalwindowContent").window({
+				title : title,
+				width : 900,
+				height : 880,
+				iconCls : 'fa fa-file-text-o'
+			}).window('open');
+		}
+		function Show4(title, mid) {
+			$("#modalwindowContent")
+					.html(
+							"<iframe width='100%' height='100%' frameborder='0''  src='../month/deptmonthplanparticular?mid="
+									+ mid + "'></iframe>");
+			$("#modalwindowContent").window({
+				title : title,
+				width : 900,
+				height : 880,
+				iconCls : 'fa fa-file-text-o'
+			}).window('open');
+		}
+		function Show5(title, wid, uid) {
+			$("#modalwindowContent")
+					.html(
+							"<iframe width='100%' height='100%' frameborder='0''  src='../weeks/weeksplanparticulars?wid="
+									+ wid + "&uid=" + uid + "'></iframe>");
+			$("#modalwindowContent").window({
+				title : title,
+				width : 900,
+				height : 880,
+				iconCls : 'fa fa-file-text-o'
+			}).window('open');
+		}
+		function frameReturnByClose() {
+			$("#modalwindowContent2").window('close');
+		}
+		function frameReturnByMes(mes) {
+			$.messageBox5s('系统提示', mes);
+			setTimeout("location.href='index'", 1000);
+		}
+	</script>
+</body>
+									<script type="text/javascript">
+											$('#insbody${ins.iid}').attr(
+													"title",
+													"${ins.body}".replace(
+															/<\/?.+?>/g, "")
+															.replace(/ /g, ""));
+										</script>
+</html>

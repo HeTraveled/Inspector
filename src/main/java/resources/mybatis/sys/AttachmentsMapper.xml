@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sys.mapper.AttachmentsMapper" >
+  <resultMap id="BaseResultMap" type="com.sys.model.Attachments" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="source" property="source" jdbcType="INTEGER" />
+    <result column="source_id" property="sourceId" jdbcType="INTEGER" />
+    <result column="attachment" property="attachment" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, source, source_id, attachment
+  </sql>
+    <select id="selectid" resultMap="BaseResultMap" parameterType="com.sys.model.Attachments" >
+    select 
+    <include refid="Base_Column_List" />
+    from attachments
+    where source=#{source} and source_id=#{sourceId}
+  </select>
+  <delete id="delete" parameterType="com.sys.model.Attachments">
+  delete from attachments 	where source=#{source} and source_id=#{sourceId}
+  </delete>
+  <select id="display" resultMap="BaseResultMap" parameterType="com.sys.model.Attachments" >
+  	select 
+  	<include refid="Base_Column_List" />
+  	from attachments
+  	where source=#{source} and source_id=#{sourceId}
+  </select>
+   <insert id="creates" parameterType="java.util.List">
+  	  insert into attachments (id, source, source_id, 
+      attachment)
+    values 
+    <foreach collection="list" item="mes" index="index" separator=",">
+        	(null,#{mes.source},#{mes.sourceId},#{mes.attachment})
+    </foreach>
+  </insert>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from attachments
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from attachments
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.sys.model.Attachments" >
+    insert into attachments (id, source, source_id, 
+      attachment)
+    values (#{id,jdbcType=INTEGER}, #{source,jdbcType=INTEGER}, #{sourceId,jdbcType=INTEGER}, 
+      #{attachment,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.sys.model.Attachments" >
+    insert into attachments
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="source != null" >
+        source,
+      </if>
+      <if test="sourceId != null" >
+        source_id,
+      </if>
+      <if test="attachment != null" >
+        attachment,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="source != null" >
+        #{source,jdbcType=INTEGER},
+      </if>
+      <if test="sourceId != null" >
+        #{sourceId,jdbcType=INTEGER},
+      </if>
+      <if test="attachment != null" >
+        #{attachment,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.sys.model.Attachments" >
+    update attachments
+    <set >
+      <if test="source != null" >
+        source = #{source,jdbcType=INTEGER},
+      </if>
+      <if test="sourceId != null" >
+        source_id = #{sourceId,jdbcType=INTEGER},
+      </if>
+      <if test="attachment != null" >
+        attachment = #{attachment,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.sys.model.Attachments" >
+    update attachments
+    set source = #{source,jdbcType=INTEGER},
+      source_id = #{sourceId,jdbcType=INTEGER},
+      attachment = #{attachment,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

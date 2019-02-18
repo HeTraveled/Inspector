@@ -1,0 +1,56 @@
+package com.util.wechat;
+
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.github.pagehelper.StringUtil;
+import com.util.Log;
+
+public class WeChat {
+
+	 /**
+	    * 微信退款
+  */
+	public static boolean weiXinPayOrderRefund(Integer out_trade_no,BigDecimal total_fee,
+		 HttpServletRequest request,HttpServletResponse response){
+     try {
+             // 获取生成预支付订单的请求类
+    	 PreRequestHandler preRequestHandler = new PreRequestHandler(request, response);
+    	 preRequestHandler.setParameter("appid", ConstantUtil.APP_ID);
+    	 preRequestHandler.setParameter("mch_id", ConstantUtil.MCH_ID);
+    	 preRequestHandler.setParameter("out_refund_no", OrderNumUtil.orderDatrNum());
+    	 preRequestHandler.setParameter("nonce_str", WXUtil.getNonceStr());
+    	 preRequestHandler.setParameter("out_trade_no", String.valueOf(out_trade_no));
+    	 String totalFee=String.valueOf((int)(Float.valueOf(total_fee.floatValue())*100));
+    	 preRequestHandler.setParameter("total_fee", totalFee);//订单金额
+    	 preRequestHandler.setParameter("refund_fee", totalFee);//退款金额
+             /**
+              * 注意签名（sign）的生成方式，具体见官方文档（传参都要参与生成签名，且参数名按照字典序排序，最后接上APP_KEY,转化成大写）
+              */
+             preRequestHandler.setParameter("sign", preRequestHandler.createMD5Sign());
+             preRequestHandler.setGateUrl(ConstantUtil.GATEREFUNDURL);
+             String preSelectXml = preRequestHandler.sendPreSelectXml();
+             String retur = WXUtil.payHttps(ConstantUtil.GATEREFUNDURL, preSelectXml);
+             Map returnMap = new HashMap();
+             if (StringUtil.isNotEmpty(retur)) {
+                 returnMap = WXUtil.parseXmlToMap(retur);
+                 //判断是否成功
+                 if (StringUtil.isNotEmpty((String) returnMap.get("result_code")) && "SUCCESS".equals(returnMap.get("result_code"))) {
+                     //处理订单信息
+                     //根据订单号查询订单信息//修改订单信息  修改支付状态  为退款状态
+                     return true;
+                 }
+             }
+         }catch (Exception e) {
+         Log.getLogger().error(e.getMessage(),e);
+         return false;
+     }
+	return false;
+ }
+}

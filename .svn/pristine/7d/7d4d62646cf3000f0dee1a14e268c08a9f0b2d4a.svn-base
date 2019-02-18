@@ -1,0 +1,278 @@
+package com.util.timing;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.ServletException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import com.dept.model.Dept;
+import com.dept.model.Emergency;
+import com.dept.service.DeptService;
+import com.dept.service.EmergencyService;
+import com.home.model.Score;
+import com.home.model.User;
+import com.home.service.ScoreService;
+import com.home.service.UserService;
+import com.inspector.model.Inspector;
+import com.inspector.service.InspectorProgressService;
+import com.inspector.service.InspectorService;
+import com.plan.model.MonthPlanNext;
+import com.plan.model.WeeksPlan;
+import com.plan.model.WeeksPlanNext;
+import com.plan.service.MonthPlanNextService;
+import com.plan.service.WeeksPlanNextService;
+import com.plan.service.WeeksPlanService;
+import com.schedule.model.Schedule;
+import com.schedule.model.ScheduleRemind;
+import com.schedule.service.ScheduleService;
+import com.sys.model.MesWechatRecord;
+import com.util.HTMLSpirit;
+import com.util.Log;
+import com.wechat.controller.WechatController;
+
+@Component("task")
+public class Task {
+	
+	@Autowired
+	private InspectorService inspectorService;
+	@Autowired
+	private WeeksPlanNextService weeksplannextService;
+	@Autowired
+	private MonthPlanNextService monthplannextService;
+	@Autowired
+	private ScheduleService scheduleService;
+	@Autowired
+	private DeptService deptService;
+	@Autowired
+	private ScoreService scoreService;
+	@Autowired
+	private InspectorProgressService inspectorProgressService;
+	@Autowired
+	private UserService userService;
+	@Autowired
+	private EmergencyService emergencyService;
+	@Autowired
+	private WeeksPlanService weeksPlanService;
+	
+	/*
+	 *   每日6点
+	 */
+	@SuppressWarnings("deprecation")
+	@Scheduled(cron="0 0 6 * * ?")
+	public void Delay(){
+		try {
+			List<Inspector> inspectors=inspectorService.overdue();
+			Date date=new Date();
+			if(inspectors!=null&&inspectors.size()!=0){
+				List<Integer> iid=new ArrayList<Integer>();
+				List<Score> scores=new ArrayList<Score>();
+				for(int i=0;i<inspectors.size();i++){
+					Inspector inspector=inspectors.get(i);
+					//推送微信消息
+					List<User> res=userService.selectdid(inspector.getResponsibility());
+					String assistDept=inspector.getAssistDept();
+					List<Integer> id=new ArrayList<Integer>();
+					//协办领导
+					if(inspector.getLeadership()!=null&&inspector.getLeadership()!=0)id.add(inspector.getLeadership());
+					//一人负责管理多部门
+					Dept dept=deptService.selectByPrimaryKey(inspector.getResponsibility());
+					User pri=userService.selectuid(dept.getPrincipal());
+					//责任单位
+					if(res!=null&&res.size()!=0)for(int z=0;z<res.size();z++)if(pri.getUid()!=res.get(z).getUid())id.add(res.get(z).getUid());
+						//负责人计数
+						if(deptService.countPri(pri.getUid())>=1)if(pri.getDid()!=inspector.getResponsibility())id.add(pri.getUid());
+					//协助单位
+					if(assistDept!=null&&!assistDept.equals("")){
+					String[] ass=assistDept.split(",");
+					if(ass!=null&&ass.length!=0){
+						for(int z=0;z<ass.length;z++){
+							Integer xiezhu=Integer.parseInt(ass[z]);
+							List<User> users=userService.selectdid(xiezhu);
+							//一人负责管理多部门
+							Dept d=deptService.selectByPrimaryKey(xiezhu);
+							User p=userService.selectuid(d.getPrincipal());
+							if(users!=null&&users.size()!=0)for(int j=0;j<users.size();j++)if(p.getUid()!=users.get(j).getUid())id.add(users.get(j).getUid());
+							//负责人计数
+							if(deptService.countPri(p.getUid())>=1)if(p.getDid()!=xiezhu)id.add(p.getUid());
+						}
+					}
+					}
+					if(id!=null&&id.size()!=0){
+						for(int q=0;q<id.size();q++){
+							User user=userService.selectuid(id.get(q));
+							if(user.getWechat()!=null&&!user.getWechat().equals("")){
+							WechatController.sendIns(inspector.getSource(),HTMLSpirit.delHTMLTag(inspector.getBody()).replaceAll("&nbsp;", " "), 
+									"已超期", "工作项已超期，请抓紧时间处理以上工作", user.getWechat().trim(),inspector.getIid());
+							}
+						}
+					}
+					iid.add(inspector.getIid());
+					scores.add(new Score(
+							deptService.selectByPrimaryKey(inspector.getResponsibility()).getPrincipal(),
+							2,inspector.getIid(),0,1,1,date.getMonth()+1,
+							Integer.parseInt(date.toLocaleString().substring(0, 4))));
+					//查询前一天是否进行反馈 未反馈则扣分
+					Calendar cal=Calendar.getInstance();
+					cal.add(Calendar.DATE,-1);
+					Date time=cal.getTime();
+					SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+					if(inspectorProgressService.selectDay(sdf.format(time),
+							String.valueOf(inspector.getIid()))==0){
+						scoreService.create(new Score(deptService.selectByPrimaryKey(inspector.getResponsibility()).getPrincipal(),
+								1,inspector.getIid(),0,1,1,date.getMonth()+1,Integer.parseInt(date.toLocaleString().substring(0, 4))));
+					};
+				}
+				//将数据批量修改为超期
+				inspectorService.updateOverdue(iid);
+				//将超期批量扣分
+				scoreService.creates(scores);
+				
+			}
+			//督查事项日反馈
+			List<Inspector> feedbackDay=inspectorService.feedback(1);
+			if(feedbackDay!=null&&feedbackDay.size()!=0){
+				for(int i=0;i<feedbackDay.size();i++){
+					//查询昨天是否反馈
+					Calendar cal=Calendar.getInstance();
+					cal.add(Calendar.DATE,-1);
+					Date time=cal.getTime();
+					SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+					if(inspectorProgressService.selectDay(sdf.format(time),
+							String.valueOf(feedbackDay.get(i).getIid()))==0){
+						scoreService.create(new Score(deptService.selectByPrimaryKey(feedbackDay.get(i).getResponsibility()).getPrincipal(),
+								1,feedbackDay.get(i).getIid(),0,1,1,date.getMonth()+1,Integer.parseInt(date.toLocaleString().substring(0, 4))));
+					};
+				}
+			}
+		} catch (Exception e) {
+			 Log.getLogger().error(e.getMessage(),e);  
+		}
+	}
+	/*
+	 *   每周六0点
+	 */
+	@Scheduled(cron="0 0 0 ? * SAT")
+	public void feedbackWeeks(){
+		List<Inspector> inspectors=inspectorService.feedback(2);
+		Date date=new Date();
+		if(inspectors!=null&&inspectors.size()!=0){
+			for(int i=0;i<inspectors.size();i++){
+				//查询本周是否反馈
+				Calendar cal=Calendar.getInstance();
+				cal.add(Calendar.DATE,-7);
+				Date time=cal.getTime();
+				SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+				if(inspectorProgressService.selectDay(sdf.format(time),
+						String.valueOf(inspectors.get(i).getIid()))==0){
+					scoreService.create(new Score(deptService.selectByPrimaryKey(inspectors.get(i).getResponsibility()).getPrincipal(),
+							1,inspectors.get(i).getIid(),0,1,1,date.getMonth()+1,Integer.parseInt(date.toLocaleString().substring(0, 4))));
+				};
+			}
+		}
+		//清除部门看板周计划
+//		emergencyService.delWeek();
+//		//添加所有部门本周提报的计划
+//		List<Emergency> emergencies=new ArrayList<Emergency>();
+//		Calendar cal = Calendar.getInstance();
+//		cal.setFirstDayOfWeek(Calendar.MONDAY);//设置周一为一周的第一天
+//		cal.setTime(new Date());
+//		int year=cal.get(Calendar.YEAR);//年
+//		int month=cal.get(Calendar.MONTH)+1;//月
+//		int week = cal.get(Calendar.WEEK_OF_YEAR)+1;//周
+//		List<WeeksPlan> weeksPlans=weeksPlanService.selectEme(year, month, week);
+//		if(weeksPlans!=null&&weeksPlans.size()!=0){
+//			for(int i=0;i<weeksPlans.size();i++){
+//				WeeksPlan weeksPlan=weeksPlans.get(i);
+//				Integer did=userService.selectuid(weeksPlan.getUid()).getDid();
+//				if(weeksPlan.getWeeksPlanNext()!=null&&weeksPlan.getWeeksPlanNext().size()!=0)
+//					for(int j=0;j<weeksPlan.getWeeksPlanNext().size();j++){
+//						emergencies.add(new Emergency(did,4,2,weeksPlan.getWeeksPlanNext().get(j).getId()));
+//					}
+//			}
+//		}
+//		if(emergencies.size()!=0)emergencyService.creates(emergencies);
+	}
+	/*
+	 *   每月26号0点
+	 */
+	@Scheduled(cron="0 0 0 26 * ?")
+	public void feedbackMonth(){
+		List<Inspector> inspectors=inspectorService.feedback(3);
+		Date date=new Date();
+		if(inspectors!=null&&inspectors.size()!=0){
+			for(int i=0;i<inspectors.size();i++){
+				//查询本月是否反馈
+				Calendar cal=Calendar.getInstance();
+				cal.add(Calendar.DATE,-30);
+				Date time=cal.getTime();
+				SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+				if(inspectorProgressService.selectDay(sdf.format(time),
+						String.valueOf(inspectors.get(i).getIid()))==0){
+					scoreService.create(new Score(deptService.selectByPrimaryKey(inspectors.get(i).getResponsibility()).getPrincipal(),
+							1,inspectors.get(i).getIid(),0,1,1,date.getMonth()+1,Integer.parseInt(date.toLocaleString().substring(0, 4))));
+				};
+			}
+		}
+	}
+	//周计划完成状态
+	@Scheduled(cron="0 0 6 * * ?")
+	public void weeksplanstate(){
+		List<WeeksPlanNext> weeksplannext=weeksplannextService.weeksplannextoverdue();
+		if(weeksplannext!=null&&weeksplannext.size()!=0){
+			List<Integer> id=new ArrayList<Integer>();
+			for(int i=0;i<weeksplannext.size();i++)id.add(weeksplannext.get(i).getId());
+			weeksplannextService.updateOverdue(id);
+		}
+		}
+	
+	//月计划完成状态
+		@Scheduled(cron="0 0 6 * * ?")
+		public void monthplanstate(){
+			List<MonthPlanNext> monthPlanNext=monthplannextService.monthplannextoverdue();
+			if(monthPlanNext!=null&&monthPlanNext.size()!=0){
+				List<Integer> id=new ArrayList<Integer>();
+				for(int i=0;i<monthPlanNext.size();i++)id.add(monthPlanNext.get(i).getId());
+				monthplannextService.updateOverdue(id);
+			}
+			}
+	
+
+	/*
+	 *  推送日程  每日9点
+	 */
+	@SuppressWarnings("deprecation")
+	@Scheduled(cron="0 0 9 * * ?")
+	public void propelling(){
+		try {
+		List<Schedule> schedules=scheduleService.selectday();
+		if(schedules!=null&&schedules.size()!=0){
+			WechatController wc=new WechatController();
+			for(int i=0;i<schedules.size();i++){
+				Schedule schedule=schedules.get(i);
+				if(schedule.getScheduleReminds()!=null&&schedule.getScheduleReminds().size()!=0){
+					for(int j=0;j<schedule.getScheduleReminds().size();j++){
+						ScheduleRemind sr=schedule.getScheduleReminds().get(j);
+						if(sr.getUid()==0)continue;
+						if(sr.getWechat()!=null&&!sr.getWechat().equals("")){
+								wc.sendtemplate(4, schedule.getBody(),schedule.getStartTime().toLocaleString(),
+										"结束时间："+schedule.getEndTime().toLocaleString(),sr.getWechat());
+						}
+					}
+				}
+			}
+		}
+		} catch (ServletException e) {
+			 Log.getLogger().error(e.getMessage(),e);  
+		} catch (IOException e) {
+			 Log.getLogger().error(e.getMessage(),e);  
+		}
+	}
+}

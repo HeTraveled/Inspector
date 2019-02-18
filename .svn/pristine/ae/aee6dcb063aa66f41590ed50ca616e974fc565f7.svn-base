@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.home.mapper.ScoreMapper" >
+  <resultMap id="BaseResultMap" type="com.home.model.Score" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="uid" property="uid" jdbcType="INTEGER" />
+    <result column="source" property="source" jdbcType="INTEGER" />
+    <result column="source_id" property="sourceId" jdbcType="INTEGER" />
+    <result column="add_sub" property="addSub" jdbcType="INTEGER" />
+    <result column="score" property="score" jdbcType="INTEGER" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+    <result column="year" property="year" jdbcType="INTEGER" />
+    <result column="month" property="month" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, uid, source, source_id, add_sub, score, state, year, month
+  </sql>
+  <update id="lose" parameterType="com.home.model.Score">
+  	update score set state=0 where uid=#{uid} and source_id=#{sourceId} and add_sub=0 and source=2
+  </update>
+    <insert id="creates" parameterType="java.util.List">
+  	   insert into score (id, uid, source, 
+      source_id, add_sub, score, 
+      state, year, month) values
+    <foreach collection="list" item="score" index="index" separator=",">
+        	(null,#{score.uid},#{score.source},#{score.sourceId},#{score.addSub},#{score.score},#{score.state},#{score.year},#{score.month})
+    </foreach>
+  </insert>
+  <select id="monthscore" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+  	select sum(score) from score where uid=#{uid} 
+  	and year=#{year} and month=#{month}
+  	and state=1 and add_sub=#{addSub}
+  </select>
+  <select  id="display" resultMap="BaseResultMap" parameterType="com.home.model.Score">
+  	  select 
+    <include refid="Base_Column_List" />
+    from score
+ <where>
+ 	uid=#{uid} and year=#{year} and month=#{month}
+ 	<if test="source!=null">
+ 	and source=#{source}
+ 	</if>
+ 	<if test="addSub!=null">
+ 		and add_sub=#{addSub}
+ 	</if>
+ 	<if test="score!=null">
+ 			<if test="numflag==1">
+    		and score=#{score}
+    	</if>
+    	<if test="numflag==2">
+    		and score&lt;=#{score}
+    	</if>
+    	<if test="numflag==3">
+    		and score&gt;=#{score}
+    	</if>
+ 	</if>
+ 	 	<if test="state!=null">
+ 		and state=#{state}
+ 	</if>
+ 		 	<if test="id!=null">
+ 		and id=#{id}
+ 	</if>
+ </where>
+ ${orderby}
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from score
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from score
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.home.model.Score" >
+    insert into score (id, uid, source, 
+      source_id, add_sub, score, 
+      state, year, month)
+    values (#{id,jdbcType=INTEGER}, #{uid,jdbcType=INTEGER}, #{source,jdbcType=INTEGER}, 
+      #{sourceId,jdbcType=INTEGER}, #{addSub,jdbcType=INTEGER}, #{score,jdbcType=INTEGER}, 
+      #{state,jdbcType=INTEGER}, #{year,jdbcType=INTEGER}, #{month,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.home.model.Score" >
+    insert into score
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="uid != null" >
+        uid,
+      </if>
+      <if test="source != null" >
+        source,
+      </if>
+      <if test="sourceId != null" >
+        source_id,
+      </if>
+      <if test="addSub != null" >
+        add_sub,
+      </if>
+      <if test="score != null" >
+        score,
+      </if>
+      <if test="state != null" >
+        state,
+      </if>
+      <if test="year != null" >
+        year,
+      </if>
+      <if test="month != null" >
+        month,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="uid != null" >
+        #{uid,jdbcType=INTEGER},
+      </if>
+      <if test="source != null" >
+        #{source,jdbcType=INTEGER},
+      </if>
+      <if test="sourceId != null" >
+        #{sourceId,jdbcType=INTEGER},
+      </if>
+      <if test="addSub != null" >
+        #{addSub,jdbcType=INTEGER},
+      </if>
+      <if test="score != null" >
+        #{score,jdbcType=INTEGER},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=INTEGER},
+      </if>
+      <if test="year != null" >
+        #{year,jdbcType=INTEGER},
+      </if>
+      <if test="month != null" >
+        #{month,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.home.model.Score" >
+    update score
+    <set >
+      <if test="uid != null" >
+        uid = #{uid,jdbcType=INTEGER},
+      </if>
+      <if test="source != null" >
+        source = #{source,jdbcType=INTEGER},
+      </if>
+      <if test="sourceId != null" >
+        source_id = #{sourceId,jdbcType=INTEGER},
+      </if>
+      <if test="addSub != null" >
+        add_sub = #{addSub,jdbcType=INTEGER},
+      </if>
+      <if test="score != null" >
+        score = #{score,jdbcType=INTEGER},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=INTEGER},
+      </if>
+      <if test="year != null" >
+        year = #{year,jdbcType=INTEGER},
+      </if>
+      <if test="month != null" >
+        month = #{month,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.home.model.Score" >
+    update score
+    set uid = #{uid,jdbcType=INTEGER},
+      source = #{source,jdbcType=INTEGER},
+      source_id = #{sourceId,jdbcType=INTEGER},
+      add_sub = #{addSub,jdbcType=INTEGER},
+      score = #{score,jdbcType=INTEGER},
+      state = #{state,jdbcType=INTEGER},
+      year = #{year,jdbcType=INTEGER},
+      month = #{month,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

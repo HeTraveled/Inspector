@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+     xmlns="http://www.springframework.org/schema/beans"  
+     xsi:schemaLocation="http://www.springframework.org/schema/beans 
+     http://www.springframework.org/schema/beans/spring-beans-4.2.xsd">
+     
+	<bean id="inspectorService" class="com.inspector.service.impl.InspectorImpl">
+		<property name="inspectorMapper" ref="inspectorMapper" />
+		<property name="inspectorRecordMapper" ref="inspectorRecordMapper" />
+		<property name="deptMapper" ref="deptMapper" />
+		<property name="userMapper" ref="userMapper" />
+	</bean>
+		<bean id="inspectorMessageService" class="com.inspector.service.impl.InspectorMessageImpl">
+		<property name="inspectorMessageMapper" ref="inspectorMessageMapper" />
+	</bean>
+	<bean id="inspectorOpinionService" class="com.inspector.service.impl.InspectorOpinionImpl">
+		<property name="inspectorOpinionMapper" ref="inspectorOpinionMapper" />
+	</bean>
+	<bean id="inspectorProgressService" class="com.inspector.service.impl.InspectorProgressImpl">
+		<property name="inspectorProgressMapper" ref="inspectorProgressMapper" />
+	</bean>
+	<bean id="inspectorRecordService" class="com.inspector.service.impl.InspectorRecordImpl">
+		<property name="inspectorRecordMapper" ref="inspectorRecordMapper" />
+	</bean>
+		<bean id="inspectorNameService" class="com.inspector.service.impl.InspectorNameImpl">
+		<property name="inspectorNameMapper" ref="inspectorNameMapper" />
+	</bean>
+</beans>

@@ -1,0 +1,171 @@
+package com.dept.model;
+
+import java.util.List;
+
+import com.home.model.User;
+import com.plan.model.WeeksPlanNext;
+
+public class Dept {
+    private Integer id;
+
+    private String departmentname;
+
+    private Integer topDid;
+
+    private String tel;
+
+    private String fax;
+
+    private Integer principal;
+    
+    private List<Dept> dept;
+    
+    private String name;
+
+    private List<User> user;
+    
+    private String leadershipname;
+    
+    private String principalname;
+    
+    private List<WeeksPlanNext> weeksplannext;
+    
+    private Integer score;
+    
+    
+    
+    public Integer getScore() {
+		return score;
+	}
+
+
+
+	public void setScore(Integer score) {
+		this.score = score;
+	}
+
+
+
+	public List<WeeksPlanNext> getWeeksplannext() {
+		return weeksplannext;
+	}
+
+
+
+	public void setWeeksplannext(List<WeeksPlanNext> weeksplannext) {
+		this.weeksplannext = weeksplannext;
+	}
+
+
+
+	public Dept(){}
+    
+    
+
+	public String getLeadershipname() {
+		return leadershipname;
+	}
+
+
+
+	public void setLeadershipname(String leadershipname) {
+		this.leadershipname = leadershipname;
+	}
+
+
+
+	public String getPrincipalname() {
+		return principalname;
+	}
+
+
+
+	public void setPrincipalname(String principalname) {
+		this.principalname = principalname;
+	}
+
+
+
+	public List<User> getUser() {
+		return user;
+	}
+    public void setUser(List<User> user) {
+		this.user = user;
+	}
+
+    private Integer leadership;
+
+
+    public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getDepartmentname() {
+        return departmentname;
+    }
+
+    public void setDepartmentname(String departmentname) {
+        this.departmentname = departmentname == null ? null : departmentname.trim();
+    }
+
+    public Integer getTopDid() {
+        return topDid;
+    }
+
+    public void setTopDid(Integer topDid) {
+        this.topDid = topDid;
+    }
+
+    public String getTel() {
+        return tel;
+    }
+
+    public void setTel(String tel) {
+        this.tel = tel == null ? null : tel.trim();
+    }
+
+    public String getFax() {
+        return fax;
+    }
+
+    public void setFax(String fax) {
+        this.fax = fax == null ? null : fax.trim();
+    }
+
+    public Integer getPrincipal() {
+        return principal;
+    }
+
+    public void setPrincipal(Integer principal) {
+        this.principal = principal;
+    }
+
+	public List<Dept> getDept() {
+		return dept;
+	}
+
+	public void setDept(List<Dept> dept) {
+		this.dept = dept;
+	}
+
+	public Integer getLeadership() {
+		return leadership;
+	}
+
+	public void setLeadership(Integer leadership) {
+		this.leadership = leadership;
+	}
+    
+}

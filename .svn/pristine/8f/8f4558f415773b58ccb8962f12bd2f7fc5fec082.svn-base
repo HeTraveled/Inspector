@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+     xmlns="http://www.springframework.org/schema/beans"  
+     xsi:schemaLocation="http://www.springframework.org/schema/beans 
+     http://www.springframework.org/schema/beans/spring-beans-4.2.xsd">
+     
+
+	<bean id="monthPlanService" class="com.plan.service.impl.MonthPlanImpl">
+		<property name="monthPlanMapper" ref="monthPlanMapper" />
+	</bean>
+	<bean id="monthPlanMessageService" class="com.plan.service.impl.MonthPlanMessageImpl">
+		<property name="monthPlanMessageMapper" ref="monthPlanMessageMapper" />
+	</bean>
+	<bean id="monthPlanNextService" class="com.plan.service.impl.MonthPlanNextImpl">
+		<property name="monthPlanNextMapper" ref="monthPlanNextMapper" />
+	</bean>
+	<bean id="weeksPlanMessageService" class="com.plan.service.impl.WeeksPlanMessageImpl">
+		<property name="weeksPlanMessageMapper" ref="weeksPlanMessageMapper" />
+	</bean>
+	<bean id="weeksPlanNextService" class="com.plan.service.impl.WeeksPlanNextImpl">
+		<property name="weeksPlanNextMapper" ref="weeksPlanNextMapper" />
+	</bean>
+	<bean id="weeksPlanService" class="com.plan.service.impl.WeeksPlanImpl">
+		<property name="weeksPlanMapper" ref="weeksPlanMapper" />
+	</bean>
+	<bean id="yearPlanService" class="com.plan.service.impl.YearPlanImpl">
+		<property name="yearPlanMapper" ref="yearPlanMapper" />
+	</bean>
+	<bean id="yearPlanNextService" class="com.plan.service.impl.YearPlanNextImpl">
+		<property name="yearPlanNextMapper" ref="yearPlanNextMapper" />
+	</bean>
+</beans>
